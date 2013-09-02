@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="js/OpenLayers-2.13.1/theme/default/style.css" type="text/css">
+    <link rel="stylesheet" href="css/style-ol2-ice.css" type="text/css">
+    <style>
+        .map {
+            width: 100%;
+            height: 800px;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script src="js/OpenLayers-2.13.1/OpenLayers.debug.js"></script>
+    <script type="text/javascript">
+        var lon = 5;
+        var lat = 40;
+        var zoom = 2;
+        var extent = new OpenLayers.Bounds(1000000,4700000,2200000,6300000);
+        var map, layer;
+        var proj3031 = new OpenLayers.Projection("EPSG:3031");
+        var currCountry = 'Antarctica',
+            currMapProj = proj3031,
+            currMapUnits = 'm',
+            //currMapMaxExtent = new OpenLayers.Bounds(-8000000,-8000000,8000000,8000000),
+            currMapMaxExtent = new OpenLayers.Bounds(-5000000,-5000000,5000000,5000000),
+            currMapNumZoomLevels = 14,
+            currMapScales = [50000, 100000, 250000, 350000, 500000, 1000000, 2000000, 4000000, 8000000, 12000000, 16000000, 20000000, 24000000, 28000000, 32000000, 36000000],
+            // Set default values for lon,lat,zoom
+            currLon = 0,
+            currLat = 0,
+            currZoom = 0;
+        var antarcBath = new OpenLayers.Layer.WMS(
+            "Bathymetery Hillshade (processed & merged)",
+            "http://proxy.zen.landcareresearch.co.nz/zenmaps-b/cgi-bin/mapserv?map=/opt/mapserver/mapfiles/antarctic_topo_130610.map&",
+            {
+                layers: "antarc_hillshade",
+                //layers: "antarc_bathym,antarc_hillshade",
+                //layers: "antarc_bathym",
+                transparent: true,
+                //format: "image/png"
+                format: "png8"
+            },
+            //{isBaseLayer: true, opacity: 1}
+            {
+                isBaseLayer: true, 
+                opacity: 0.8
+            });
+        var mapOptions = {  
+            projection: currMapProj, 
+            units: currMapUnits, 
+            maxExtent: currMapMaxExtent, 
+            numZoomLevels: currMapNumZoomLevels,
+            scales: currMapScales, 
+            tileManager: new OpenLayers.TileManager({cacheSize: 1024}),
+            //theme: null,
+            controls: [ 
+                new OpenLayers.Control.Navigation(), 
+                //new OpenLayers.Control.MousePosition( { numDigits: 0 , displayProjection: proj4326 } ), 
+                new OpenLayers.Control.Zoom(), 
+                new OpenLayers.Control.Attribution(),
+                //new OpenLayers.Control.LoadingPanel,
+                new OpenLayers.Control.ScaleLine({ abbreviateLabel: true }),
+                new OpenLayers.Control.OverviewMap({ 
+                    'div': OpenLayers.Util.getElement('overviewMap'),
+                    size: new OpenLayers.Size(140,120)
+                }),
+                new OpenLayers.Control.LayerSwitcher({ 
+                    //'div': OpenLayers.Util.getElement(layerSwitcherDiv),
+                    'ascending': false
+                }),
+                new OpenLayers.Control.Geolocate({
+                    id: 'locate-control',
+                    geolocationOptions: {
+                        enableHighAccuracy: true,
+                        maximumAge: 0,
+                        timeout: 7000
+                    }
+                })
+            ] 
+        }; // End of mapOptions
+        var iceLayer = new OpenLayers.Layer.WMS(
+            "Sea Ice Extents",
+            "http://sandbox.zen.landcareresearch.co.nz/cgi-bin/mapserv?map=/opt/mapserver/mapfiles/antarctic_ice.map&",
+            {
+                layers: "antarc_sea_ice_extent",
+                transparent: true,
+                format: "png8",
+                time:"1970-02-01"
+            },
+            {
+                isBaseLayer: false, singleTile: true, ratio: 1, buffer: 0, opacity: 0.7
+            });
+
+        function init(){
+            map = new OpenLayers.Map('map', mapOptions);
+            layer = new OpenLayers.Layer.WMS( "OpenLayers WMS",
+                    "http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: 'basic'} );
+            map.addLayer(antarcBath);
+            map.addLayer(iceLayer);
+
+            map.setCenter(currMapMaxExtent.getCenterLonLat(), 0);
+            map.addControl( new OpenLayers.Control.LayerSwitcher() );
+        }
+        function initOld(){
+            map = new OpenLayers.Map( 'map' );
+            layer = new OpenLayers.Layer.WMS( "OpenLayers WMS",
+                    "http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: 'basic'} );
+            map.addLayer(layer);
+
+            map.setCenter(new OpenLayers.LonLat(lon, lat), zoom);
+            map.addControl( new OpenLayers.Control.LayerSwitcher() );
+        }
+        init();
+    </script>
+  </body>
+</html>
