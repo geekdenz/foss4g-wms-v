@@ -31,9 +31,12 @@ goog.provide('ol.interaction.KeyboardPanOptions');
 goog.provide('ol.interaction.KeyboardZoomOptions');
 goog.provide('ol.interaction.TouchPanOptions');
 goog.provide('ol.interaction.TouchRotateOptions');
+goog.provide('ol.layer.LayerBaseOptions');
+goog.provide('ol.layer.LayerGroupOptions');
 goog.provide('ol.layer.LayerOptions');
 goog.provide('ol.layer.TileLayerOptions');
 goog.provide('ol.layer.VectorLayerOptions');
+goog.provide('ol.layer.VideoTileLayerOptions');
 goog.provide('ol.parser.GMLOptions');
 goog.provide('ol.parser.GMLReadOptions');
 goog.provide('ol.parser.GMLWriteOptions');
@@ -48,9 +51,11 @@ goog.provide('ol.source.SourceOptions');
 goog.provide('ol.source.StamenOptions');
 goog.provide('ol.source.StaticImageOptions');
 goog.provide('ol.source.TileJSONOptions');
+goog.provide('ol.source.TiledVideoWMSOptions');
 goog.provide('ol.source.TiledWMSOptions');
 goog.provide('ol.source.VectorOptions');
 goog.provide('ol.source.VectorSource2Options');
+goog.provide('ol.source.WMSGetFeatureInfoOptions');
 goog.provide('ol.source.WMTSOptions');
 goog.provide('ol.style.IconOptions');
 goog.provide('ol.style.LineOptions');
@@ -79,7 +84,7 @@ ol.GeolocationOptions;
 
 
 /**
- * @typedef {{error: (function(Object)|undefined),
+ * @typedef {{error: (function()|undefined),
  *            layers: (Array.<ol.layer.Layer>|undefined),
  *            pixel: ol.Pixel,
  *            success: (function(Array.<Array.<string|undefined>>))}}
@@ -88,7 +93,7 @@ ol.GetFeatureInfoOptions;
 
 
 /**
- * @typedef {{error: (function(Object)|undefined),
+ * @typedef {{error: (function()|undefined),
  *            layers: (Array.<ol.layer.Layer>|undefined),
  *            pixel: ol.Pixel,
  *            success: (function(Array.<Array.<ol.Feature|undefined>>))}}
@@ -99,7 +104,7 @@ ol.GetFeaturesOptions;
 /**
  * @typedef {{controls: (ol.Collection|Array.<ol.control.Control>|undefined),
  *            interactions: (ol.Collection|undefined),
- *            layers: (Array.<ol.layer.Layer>|ol.Collection|undefined),
+ *            layers: (Array.<ol.layer.LayerBase>|ol.Collection|undefined),
  *            renderer: (ol.RendererHint|undefined),
  *            renderers: (Array.<ol.RendererHint>|undefined),
  *            target: (Element|string|undefined),
@@ -355,6 +360,29 @@ ol.interaction.TouchRotateOptions;
  *            hue: (number|undefined),
  *            opacity: (number|undefined),
  *            saturation: (number|undefined),
+ *            visible: (boolean|undefined)}}
+ */
+ol.layer.LayerBaseOptions;
+
+
+/**
+ * @typedef {{brightness: (number|undefined),
+ *            contrast: (number|undefined),
+ *            hue: (number|undefined),
+ *            layers: (Array.<ol.layer.LayerBase>|ol.Collection|undefined),
+ *            opacity: (number|undefined),
+ *            saturation: (number|undefined),
+ *            visible: (boolean|undefined)}}
+ */
+ol.layer.LayerGroupOptions;
+
+
+/**
+ * @typedef {{brightness: (number|undefined),
+ *            contrast: (number|undefined),
+ *            hue: (number|undefined),
+ *            opacity: (number|undefined),
+ *            saturation: (number|undefined),
  *            source: ol.source.Source,
  *            visible: (boolean|undefined)}}
  */
@@ -382,6 +410,19 @@ ol.layer.TileLayerOptions;
  *            visible: (boolean|undefined)}}
  */
 ol.layer.VectorLayerOptions;
+
+
+/**
+ * @typedef {{brightness: (number|undefined),
+ *            contrast: (number|undefined),
+ *            hue: (number|undefined),
+ *            opacity: (number|undefined),
+ *            preload: (number|undefined),
+ *            saturation: (number|undefined),
+ *            source: ol.source.Source,
+ *            visible: (boolean|undefined)}}
+ */
+ol.layer.VideoTileLayerOptions;
 
 
 /**
@@ -528,6 +569,20 @@ ol.source.TileJSONOptions;
  *            url: (string|undefined),
  *            urls: (Array.<string>|undefined)}}
  */
+ol.source.TiledVideoWMSOptions;
+
+
+/**
+ * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
+ *            crossOrigin: (null|string|undefined),
+ *            extent: (ol.Extent|undefined),
+ *            maxZoom: (number|undefined),
+ *            params: Object.<string,*>,
+ *            projection: ol.ProjectionLike,
+ *            tileGrid: (ol.tilegrid.TileGrid|undefined),
+ *            url: (string|undefined),
+ *            urls: (Array.<string>|undefined)}}
+ */
 ol.source.TiledWMSOptions;
 
 
@@ -550,6 +605,13 @@ ol.source.VectorOptions;
  *            projection: ol.ProjectionLike}}
  */
 ol.source.VectorSource2Options;
+
+
+/**
+ * @typedef {{method: ol.source.WMSGetFeatureInfoMethod,
+ *            params: Object}}
+ */
+ol.source.WMSGetFeatureInfoOptions;
 
 
 /**

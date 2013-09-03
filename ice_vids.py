@@ -10,17 +10,19 @@ month_start = 1
 year_end = 2013
 month_end = 6
 minz = 0
-maxz = 1
+maxz = 3
 execute = False
-maxit = 2
+maxit = 999999999999999999
+#maxit = 10
 
 towalk = '/opt/cache/antarctic_ice/ice_{_year_}_{_month_}/antarctic'
 
 avconv = "avconv"                                           # ffmpeg or avconv application
 avparams = "-r 12 -i"                                        # avconv parameters before input files and output video
-videocodec = "libx264"                                      # codec to use when encoding the video
+#videocodec = "libx264"                                      # codec to use when encoding the video
+videocodec = "libvpx"                                      # codec to use when encoding the video
 videobitrate = "10000k"                                     # bitrate of video
-videoext = "mp4"                                            # video file extension
+videoext = "webm"                                            # video file extension
 ext = 'png'
 
 tmp = '/tmp/ice-pngs'
@@ -41,13 +43,13 @@ def avc(year, month, filename, i):
     qwe = 'ice_%d_%02d' % (year, month)
     f = filename.replace(asd, qwe)
     newname = '%s/%d.%s' % (tmp, i, ext)
-    print 'cp %s %s' % (f, newname)
+    #print 'cp %s %s' % (f, newname)
     copy(f, newname)
     
 
 def process(filename):
     global year_start, year_end, month_start, month_end, towalk
-    i = 0
+    i = 1
     call(['rm','-f','%s/*' % tmp])
     for y in range(year_start, year_end + 1):                   
         if y == year_start:
@@ -62,8 +64,13 @@ def process(filename):
             for m in range(1, 13):
                 avc(y, m, filename, i)
                 i = i + 1
-    output = 'output.mp4'
-    print '%s %s %s/%%d.%s -b:v %s %s' % (avconv, avparams, tmp, ext, videobitrate, output)
+    asd = 'ice_%d_%02d' % (myyear, mymonth)
+    qwe = 'ice_videos'
+    f = filename.replace(asd, qwe)
+    output = f.replace(ext, videoext)
+    call(['mkdir','-p',path.dirname(output)])
+    cmd = '%s %s %s/%%d.%s -b:v %s %s' % (avconv, avparams, tmp, ext, videobitrate, output)
+    call(cmd.split(' '))
 
 for rootdir, dir, files in walk(towalk.replace('{_year_}', '%d' % myyear).replace('{_month_}', '%02d' % mymonth)):
     for filename in files:
@@ -77,11 +84,3 @@ for rootdir, dir, files in walk(towalk.replace('{_year_}', '%d' % myyear).replac
         print ''
         maxit = maxit - 1
         process(filename)
-
-
-
-inputfile = 'das'
-videofilename = 'asd.mp4'
-cmd = "%s %s %s -c:v %s -b:v %s %s" % (avconv,avparams,inputfile,videocodec,videobitrate,videofilename)
-
-print cmd

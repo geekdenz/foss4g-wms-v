@@ -1,8 +1,11 @@
+goog.require('ol');
 goog.require('ol.Attribution');
 goog.require('ol.Collection');
-goog.require('ol.Expression');
+goog.require('ol.DeviceOrientation');
+goog.require('ol.DeviceOrientation.SUPPORTED');
 goog.require('ol.Feature');
 goog.require('ol.Geolocation');
+goog.require('ol.Geolocation.SUPPORTED');
 goog.require('ol.Map');
 goog.require('ol.MapBrowserEvent');
 goog.require('ol.Object');
@@ -15,6 +18,7 @@ goog.require('ol.RendererHints');
 goog.require('ol.View2D');
 goog.require('ol.animation');
 goog.require('ol.control.Attribution');
+goog.require('ol.control.Control');
 goog.require('ol.control.FullScreen');
 goog.require('ol.control.Logo');
 goog.require('ol.control.MousePosition');
@@ -22,30 +26,40 @@ goog.require('ol.control.ScaleLine');
 goog.require('ol.control.ScaleLineUnits');
 goog.require('ol.control.Zoom');
 goog.require('ol.control.ZoomSlider');
+goog.require('ol.control.ZoomToExtent');
 goog.require('ol.coordinate');
 goog.require('ol.dom.Input');
 goog.require('ol.easing');
+goog.require('ol.expr');
 goog.require('ol.extent');
-goog.require('ol.filter.Filter');
-goog.require('ol.filter.Geometry');
-goog.require('ol.filter.Logical');
-goog.require('ol.filter.LogicalOperator');
+goog.require('ol.geom.GeometryType');
 goog.require('ol.geom.LineString');
 goog.require('ol.geom.MultiLineString');
 goog.require('ol.geom.MultiPoint');
 goog.require('ol.geom.MultiPolygon');
 goog.require('ol.geom.Point');
 goog.require('ol.geom.Polygon');
+goog.require('ol.geom2.LineStringCollection');
+goog.require('ol.geom2.PointCollection');
 goog.require('ol.interaction.DragRotateAndZoom');
 goog.require('ol.interaction.condition');
 goog.require('ol.layer.ImageLayer');
+goog.require('ol.layer.Layer');
+goog.require('ol.layer.LayerGroup');
 goog.require('ol.layer.TileLayer');
 goog.require('ol.layer.Vector');
+goog.require('ol.layer.VectorLayer2');
+goog.require('ol.layer.VideoTileLayer');
+goog.require('ol.parser.GPX');
 goog.require('ol.parser.GeoJSON');
 goog.require('ol.parser.KML');
+goog.require('ol.parser.TopoJSON');
+goog.require('ol.parser.WKT');
+goog.require('ol.parser.ogc.GML_v2');
+goog.require('ol.parser.ogc.GML_v3');
 goog.require('ol.parser.ogc.WMSCapabilities');
 goog.require('ol.parser.ogc.WMTSCapabilities');
-goog.require('ol.projection');
+goog.require('ol.proj');
 goog.require('ol.renderer.canvas.Map');
 goog.require('ol.source.BingMaps');
 goog.require('ol.source.DebugTileSource');
@@ -56,9 +70,13 @@ goog.require('ol.source.SingleImageWMS');
 goog.require('ol.source.Stamen');
 goog.require('ol.source.StaticImage');
 goog.require('ol.source.TileJSON');
+goog.require('ol.source.TileSource');
 goog.require('ol.source.TiledVideoWMS');
 goog.require('ol.source.TiledWMS');
 goog.require('ol.source.Vector');
+goog.require('ol.source.VectorSource2');
+goog.require('ol.source.VideoTileSource');
+goog.require('ol.source.WMSGetFeatureInfoMethod');
 goog.require('ol.source.WMTS');
 goog.require('ol.style.Icon');
 goog.require('ol.style.IconType');
@@ -68,14 +86,10 @@ goog.require('ol.style.Rule');
 goog.require('ol.style.Shape');
 goog.require('ol.style.ShapeType');
 goog.require('ol.style.Style');
+goog.require('ol.style.Text');
 goog.require('ol.tilegrid.TileGrid');
 goog.require('ol.tilegrid.WMTS');
 goog.require('ol.tilegrid.XYZ');
-
-
-goog.exportSymbol(
-    'goog.require',
-    goog.nullFunction);
 
 
 goog.exportSymbol(
@@ -128,9 +142,31 @@ goog.exportProperty(
     ol.Collection.prototype.setAt);
 
 
+
+/**
+ * @constructor
+ * @extends {ol.DeviceOrientation}
+ * @param {olx.DeviceOrientationOptionsExtern} options Options.
+ */
+ol.DeviceOrientationExport = function(options) {
+  /** @type {ol.DeviceOrientationOptions} */
+  var arg = /** @type {ol.DeviceOrientationOptions} */ (options);
+  if (goog.isDefAndNotNull(options)) {
+    arg.tracking = options.tracking;
+  }
+  goog.base(this, arg);
+};
+goog.inherits(
+    ol.DeviceOrientationExport,
+    ol.DeviceOrientation);
 goog.exportSymbol(
-    'ol.Expression',
-    ol.Expression);
+    'ol.DeviceOrientation',
+    ol.DeviceOrientationExport);
+
+
+goog.exportSymbol(
+    'ol.DeviceOrientation.SUPPORTED',
+    ol.DeviceOrientation.SUPPORTED);
 
 
 goog.exportSymbol(
@@ -146,12 +182,20 @@ goog.exportProperty(
     ol.Feature.prototype.getAttributes);
 goog.exportProperty(
     ol.Feature.prototype,
+    'getFeatureId',
+    ol.Feature.prototype.getFeatureId);
+goog.exportProperty(
+    ol.Feature.prototype,
     'getGeometry',
     ol.Feature.prototype.getGeometry);
 goog.exportProperty(
     ol.Feature.prototype,
     'set',
     ol.Feature.prototype.set);
+goog.exportProperty(
+    ol.Feature.prototype,
+    'setFeatureId',
+    ol.Feature.prototype.setFeatureId);
 goog.exportProperty(
     ol.Feature.prototype,
     'setGeometry',
@@ -170,15 +214,11 @@ goog.exportProperty(
  */
 ol.GeolocationExport = function(options) {
   /** @type {ol.GeolocationOptions} */
-  var arg;
+  var arg = /** @type {ol.GeolocationOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      projection: options.projection,
-      tracking: options.tracking,
-      trackingOptions: options.trackingOptions
-    };
-  } else {
-    arg = /** @type {ol.GeolocationOptions} */ (options);
+    arg.projection = options.projection;
+    arg.tracking = options.tracking;
+    arg.trackingOptions = options.trackingOptions;
   }
   goog.base(this, arg);
 };
@@ -190,6 +230,11 @@ goog.exportSymbol(
     ol.GeolocationExport);
 
 
+goog.exportSymbol(
+    'ol.Geolocation.SUPPORTED',
+    ol.Geolocation.SUPPORTED);
+
+
 
 /**
  * @constructor
@@ -198,19 +243,15 @@ goog.exportSymbol(
  */
 ol.MapExport = function(options) {
   /** @type {ol.MapOptions} */
-  var arg;
+  var arg = /** @type {ol.MapOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      controls: options.controls,
-      interactions: options.interactions,
-      layers: options.layers,
-      renderer: options.renderer,
-      renderers: options.renderers,
-      target: options.target,
-      view: options.view
-    };
-  } else {
-    arg = /** @type {ol.MapOptions} */ (options);
+    arg.controls = options.controls;
+    arg.interactions = options.interactions;
+    arg.layers = options.layers;
+    arg.renderer = options.renderer;
+    arg.renderers = options.renderers;
+    arg.target = options.target;
+    arg.view = options.view;
   }
   goog.base(this, arg);
 };
@@ -220,6 +261,10 @@ goog.inherits(
 goog.exportSymbol(
     'ol.Map',
     ol.MapExport);
+goog.exportProperty(
+    ol.Map.prototype,
+    'addControl',
+    ol.Map.prototype.addControl);
 goog.exportProperty(
     ol.Map.prototype,
     'addLayer',
@@ -234,16 +279,28 @@ goog.exportProperty(
     ol.Map.prototype.addPreRenderFunctions);
 goog.exportProperty(
     ol.Map.prototype,
-    'getFeatureInfoForPixel',
-    ol.Map.prototype.getFeatureInfoForPixel);
+    'getFeatureInfo',
+    ol.Map.prototype.getFeatureInfo);
+goog.exportProperty(
+    ol.Map.prototype,
+    'getFeatures',
+    ol.Map.prototype.getFeatures);
 goog.exportProperty(
     ol.Map.prototype,
     'getInteractions',
     ol.Map.prototype.getInteractions);
 goog.exportProperty(
     ol.Map.prototype,
+    'getLayers',
+    ol.Map.prototype.getLayers);
+goog.exportProperty(
+    ol.Map.prototype,
     'getRenderer',
     ol.Map.prototype.getRenderer);
+goog.exportProperty(
+    ol.Map.prototype,
+    'removeControl',
+    ol.Map.prototype.removeControl);
 goog.exportProperty(
     ol.Map.prototype,
     'removeLayer',
@@ -260,6 +317,14 @@ goog.exportProperty(
     ol.MapBrowserEvent.prototype,
     'getPixel',
     ol.MapBrowserEvent.prototype.getPixel);
+goog.exportProperty(
+    ol.MapBrowserEvent.prototype,
+    'preventDefault',
+    ol.MapBrowserEvent.prototype.preventDefault);
+goog.exportProperty(
+    ol.MapBrowserEvent.prototype,
+    'stopPropagation',
+    ol.MapBrowserEvent.prototype.stopPropagation);
 
 
 goog.exportSymbol(
@@ -291,10 +356,6 @@ goog.exportProperty(
     ol.Object.prototype.set);
 goog.exportProperty(
     ol.Object.prototype,
-    'setOptions',
-    ol.Object.prototype.setOptions);
-goog.exportProperty(
-    ol.Object.prototype,
     'setValues',
     ol.Object.prototype.setValues);
 goog.exportProperty(
@@ -323,16 +384,12 @@ goog.exportProperty(
  */
 ol.OverlayExport = function(options) {
   /** @type {ol.OverlayOptions} */
-  var arg;
+  var arg = /** @type {ol.OverlayOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      element: options.element,
-      map: options.map,
-      position: options.position,
-      positioning: options.positioning
-    };
-  } else {
-    arg = /** @type {ol.OverlayOptions} */ (options);
+    arg.element = options.element;
+    arg.map = options.map;
+    arg.position = options.position;
+    arg.positioning = options.positioning;
   }
   goog.base(this, arg);
 };
@@ -373,17 +430,13 @@ goog.exportProperty(
  */
 ol.ProjectionExport = function(options) {
   /** @type {ol.ProjectionOptions} */
-  var arg;
+  var arg = /** @type {ol.ProjectionOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      axisOrientation: options.axisOrientation,
-      code: options.code,
-      extent: options.extent,
-      global: options.global,
-      units: options.units
-    };
-  } else {
-    arg = /** @type {ol.ProjectionOptions} */ (options);
+    arg.axisOrientation = options.axisOrientation;
+    arg.code = options.code;
+    arg.extent = options.extent;
+    arg.global = options.global;
+    arg.units = options.units;
   }
   goog.base(this, arg);
 };
@@ -474,21 +527,17 @@ goog.exportProperty(
  */
 ol.View2DExport = function(options) {
   /** @type {ol.View2DOptions} */
-  var arg;
+  var arg = /** @type {ol.View2DOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      center: options.center,
-      maxResolution: options.maxResolution,
-      maxZoom: options.maxZoom,
-      projection: options.projection,
-      resolution: options.resolution,
-      resolutions: options.resolutions,
-      rotation: options.rotation,
-      zoom: options.zoom,
-      zoomFactor: options.zoomFactor
-    };
-  } else {
-    arg = /** @type {ol.View2DOptions} */ (options);
+    arg.center = options.center;
+    arg.maxResolution = options.maxResolution;
+    arg.maxZoom = options.maxZoom;
+    arg.projection = options.projection;
+    arg.resolution = options.resolution;
+    arg.resolutions = options.resolutions;
+    arg.rotation = options.rotation;
+    arg.zoom = options.zoom;
+    arg.zoomFactor = options.zoomFactor;
   }
   goog.base(this, arg);
 };
@@ -500,32 +549,51 @@ goog.exportSymbol(
     ol.View2DExport);
 goog.exportProperty(
     ol.View2D.prototype,
+    'calculateExtent',
+    ol.View2D.prototype.calculateExtent);
+goog.exportProperty(
+    ol.View2D.prototype,
+    'constrainResolution',
+    ol.View2D.prototype.constrainResolution);
+goog.exportProperty(
+    ol.View2D.prototype,
+    'constrainRotation',
+    ol.View2D.prototype.constrainRotation);
+goog.exportProperty(
+    ol.View2D.prototype,
     'fitExtent',
     ol.View2D.prototype.fitExtent);
 goog.exportProperty(
     ol.View2D.prototype,
     'getView2D',
     ol.View2D.prototype.getView2D);
+goog.exportProperty(
+    ol.View2D.prototype,
+    'getZoom',
+    ol.View2D.prototype.getZoom);
+goog.exportProperty(
+    ol.View2D.prototype,
+    'setZoom',
+    ol.View2D.prototype.setZoom);
 
 
 goog.exportSymbol(
-    'ol.animation',
-    ol.animation);
-goog.exportProperty(
-    ol.animation,
-    'bounce',
+    'ol.animation.bounce',
     ol.animation.bounce);
-goog.exportProperty(
-    ol.animation,
-    'pan',
+
+
+goog.exportSymbol(
+    'ol.animation.pan',
     ol.animation.pan);
-goog.exportProperty(
-    ol.animation,
-    'rotate',
+
+
+goog.exportSymbol(
+    'ol.animation.rotate',
     ol.animation.rotate);
-goog.exportProperty(
-    ol.animation,
-    'zoom',
+
+
+goog.exportSymbol(
+    'ol.animation.zoom',
     ol.animation.zoom);
 
 
@@ -537,14 +605,11 @@ goog.exportProperty(
  */
 ol.control.AttributionExport = function(options) {
   /** @type {ol.control.AttributionOptions} */
-  var arg;
+  var arg = /** @type {ol.control.AttributionOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      map: options.map,
-      target: options.target
-    };
-  } else {
-    arg = /** @type {ol.control.AttributionOptions} */ (options);
+    arg.className = options.className;
+    arg.map = options.map;
+    arg.target = options.target;
   }
   goog.base(this, arg);
 };
@@ -563,20 +628,53 @@ goog.exportProperty(
 
 /**
  * @constructor
+ * @extends {ol.control.Control}
+ * @param {olx.control.ControlOptionsExtern} options Options.
+ */
+ol.control.ControlExport = function(options) {
+  /** @type {ol.control.ControlOptions} */
+  var arg = /** @type {ol.control.ControlOptions} */ (options);
+  if (goog.isDefAndNotNull(options)) {
+    arg.element = options.element;
+    arg.map = options.map;
+    arg.target = options.target;
+  }
+  goog.base(this, arg);
+};
+goog.inherits(
+    ol.control.ControlExport,
+    ol.control.Control);
+goog.exportSymbol(
+    'ol.control.Control',
+    ol.control.ControlExport);
+goog.exportProperty(
+    ol.control.Control.prototype,
+    'getMap',
+    ol.control.Control.prototype.getMap);
+goog.exportProperty(
+    ol.control.Control.prototype,
+    'handleMapPostrender',
+    ol.control.Control.prototype.handleMapPostrender);
+goog.exportProperty(
+    ol.control.Control.prototype,
+    'setMap',
+    ol.control.Control.prototype.setMap);
+
+
+
+/**
+ * @constructor
  * @extends {ol.control.FullScreen}
  * @param {olx.control.FullScreenOptionsExtern} options Options.
  */
 ol.control.FullScreenExport = function(options) {
   /** @type {ol.control.FullScreenOptions} */
-  var arg;
+  var arg = /** @type {ol.control.FullScreenOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      keys: options.keys,
-      map: options.map,
-      target: options.target
-    };
-  } else {
-    arg = /** @type {ol.control.FullScreenOptions} */ (options);
+    arg.className = options.className;
+    arg.keys = options.keys;
+    arg.map = options.map;
+    arg.target = options.target;
   }
   goog.base(this, arg);
 };
@@ -596,14 +694,11 @@ goog.exportSymbol(
  */
 ol.control.LogoExport = function(options) {
   /** @type {ol.control.LogoOptions} */
-  var arg;
+  var arg = /** @type {ol.control.LogoOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      map: options.map,
-      target: options.target
-    };
-  } else {
-    arg = /** @type {ol.control.LogoOptions} */ (options);
+    arg.className = options.className;
+    arg.map = options.map;
+    arg.target = options.target;
   }
   goog.base(this, arg);
 };
@@ -627,17 +722,14 @@ goog.exportProperty(
  */
 ol.control.MousePositionExport = function(options) {
   /** @type {ol.control.MousePositionOptions} */
-  var arg;
+  var arg = /** @type {ol.control.MousePositionOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      coordinateFormat: options.coordinateFormat,
-      map: options.map,
-      projection: options.projection,
-      target: options.target,
-      undefinedHTML: options.undefinedHTML
-    };
-  } else {
-    arg = /** @type {ol.control.MousePositionOptions} */ (options);
+    arg.className = options.className;
+    arg.coordinateFormat = options.coordinateFormat;
+    arg.map = options.map;
+    arg.projection = options.projection;
+    arg.target = options.target;
+    arg.undefinedHTML = options.undefinedHTML;
   }
   goog.base(this, arg);
 };
@@ -661,16 +753,13 @@ goog.exportProperty(
  */
 ol.control.ScaleLineExport = function(options) {
   /** @type {ol.control.ScaleLineOptions} */
-  var arg;
+  var arg = /** @type {ol.control.ScaleLineOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      map: options.map,
-      minWidth: options.minWidth,
-      target: options.target,
-      units: options.units
-    };
-  } else {
-    arg = /** @type {ol.control.ScaleLineOptions} */ (options);
+    arg.className = options.className;
+    arg.map = options.map;
+    arg.minWidth = options.minWidth;
+    arg.target = options.target;
+    arg.units = options.units;
   }
   goog.base(this, arg);
 };
@@ -719,15 +808,12 @@ goog.exportProperty(
  */
 ol.control.ZoomExport = function(options) {
   /** @type {ol.control.ZoomOptions} */
-  var arg;
+  var arg = /** @type {ol.control.ZoomOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      delta: options.delta,
-      map: options.map,
-      target: options.target
-    };
-  } else {
-    arg = /** @type {ol.control.ZoomOptions} */ (options);
+    arg.className = options.className;
+    arg.delta = options.delta;
+    arg.map = options.map;
+    arg.target = options.target;
   }
   goog.base(this, arg);
 };
@@ -751,15 +837,12 @@ goog.exportProperty(
  */
 ol.control.ZoomSliderExport = function(options) {
   /** @type {ol.control.ZoomSliderOptions} */
-  var arg;
+  var arg = /** @type {ol.control.ZoomSliderOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      map: options.map,
-      maxResolution: options.maxResolution,
-      minResolution: options.minResolution
-    };
-  } else {
-    arg = /** @type {ol.control.ZoomSliderOptions} */ (options);
+    arg.className = options.className;
+    arg.map = options.map;
+    arg.maxResolution = options.maxResolution;
+    arg.minResolution = options.minResolution;
   }
   goog.base(this, arg);
 };
@@ -771,14 +854,34 @@ goog.exportSymbol(
     ol.control.ZoomSliderExport);
 
 
+
+/**
+ * @constructor
+ * @extends {ol.control.ZoomToExtent}
+ * @param {olx.control.ZoomToExtentOptionsExtern} options Options.
+ */
+ol.control.ZoomToExtentExport = function(options) {
+  /** @type {ol.control.ZoomToExtentOptions} */
+  var arg = /** @type {ol.control.ZoomToExtentOptions} */ (options);
+  if (goog.isDefAndNotNull(options)) {
+    arg.className = options.className;
+    arg.extent = options.extent;
+    arg.map = options.map;
+    arg.target = options.target;
+  }
+  goog.base(this, arg);
+};
+goog.inherits(
+    ol.control.ZoomToExtentExport,
+    ol.control.ZoomToExtent);
+goog.exportSymbol(
+    'ol.control.ZoomToExtent',
+    ol.control.ZoomToExtentExport);
+
+
 goog.exportSymbol(
     'ol.control.defaults',
     ol.control.defaults);
-
-
-goog.exportSymbol(
-    'ol.coordinate',
-    ol.coordinate);
 
 
 goog.exportSymbol(
@@ -807,36 +910,48 @@ goog.exportSymbol(
 
 
 goog.exportSymbol(
-    'ol.easing',
-    ol.easing);
-goog.exportProperty(
-    ol.easing,
-    'bounce',
+    'ol.easing.bounce',
     ol.easing.bounce);
-goog.exportProperty(
-    ol.easing,
-    'easeIn',
+
+
+goog.exportSymbol(
+    'ol.easing.easeIn',
     ol.easing.easeIn);
-goog.exportProperty(
-    ol.easing,
-    'easeOut',
+
+
+goog.exportSymbol(
+    'ol.easing.easeOut',
     ol.easing.easeOut);
-goog.exportProperty(
-    ol.easing,
-    'elastic',
+
+
+goog.exportSymbol(
+    'ol.easing.elastic',
     ol.easing.elastic);
-goog.exportProperty(
-    ol.easing,
-    'inAndOut',
+
+
+goog.exportSymbol(
+    'ol.easing.inAndOut',
     ol.easing.inAndOut);
-goog.exportProperty(
-    ol.easing,
-    'linear',
+
+
+goog.exportSymbol(
+    'ol.easing.linear',
     ol.easing.linear);
-goog.exportProperty(
-    ol.easing,
-    'upAndDown',
+
+
+goog.exportSymbol(
+    'ol.easing.upAndDown',
     ol.easing.upAndDown);
+
+
+goog.exportSymbol(
+    'ol.expr.parse',
+    ol.expr.parse);
+
+
+goog.exportSymbol(
+    'ol.expr.register',
+    ol.expr.register);
 
 
 goog.exportSymbol(
@@ -920,31 +1035,40 @@ goog.exportSymbol(
 
 
 goog.exportSymbol(
-    'ol.filter.Filter',
-    ol.filter.Filter);
-
-
-goog.exportSymbol(
-    'ol.filter.Geometry',
-    ol.filter.Geometry);
-
-
-goog.exportSymbol(
-    'ol.filter.Logical',
-    ol.filter.Logical);
-
-
-goog.exportSymbol(
-    'ol.filter.LogicalOperator',
-    ol.filter.LogicalOperator);
+    'ol.geom.GeometryType',
+    ol.geom.GeometryType);
 goog.exportProperty(
-    ol.filter.LogicalOperator,
-    'AND',
-    ol.filter.LogicalOperator.AND);
+    ol.geom.GeometryType,
+    'GEOMETRYCOLLECTION',
+    ol.geom.GeometryType.GEOMETRYCOLLECTION);
 goog.exportProperty(
-    ol.filter.LogicalOperator,
-    'OR',
-    ol.filter.LogicalOperator.OR);
+    ol.geom.GeometryType,
+    'LINEARRING',
+    ol.geom.GeometryType.LINEARRING);
+goog.exportProperty(
+    ol.geom.GeometryType,
+    'LINESTRING',
+    ol.geom.GeometryType.LINESTRING);
+goog.exportProperty(
+    ol.geom.GeometryType,
+    'MULTILINESTRING',
+    ol.geom.GeometryType.MULTILINESTRING);
+goog.exportProperty(
+    ol.geom.GeometryType,
+    'MULTIPOINT',
+    ol.geom.GeometryType.MULTIPOINT);
+goog.exportProperty(
+    ol.geom.GeometryType,
+    'MULTIPOLYGON',
+    ol.geom.GeometryType.MULTIPOLYGON);
+goog.exportProperty(
+    ol.geom.GeometryType,
+    'POINT',
+    ol.geom.GeometryType.POINT);
+goog.exportProperty(
+    ol.geom.GeometryType,
+    'POLYGON',
+    ol.geom.GeometryType.POLYGON);
 
 
 goog.exportSymbol(
@@ -977,6 +1101,40 @@ goog.exportSymbol(
     ol.geom.Polygon);
 
 
+goog.exportSymbol(
+    'ol.geom2.LineStringCollection',
+    ol.geom2.LineStringCollection);
+
+
+goog.exportSymbol(
+    'ol.geom2.LineStringCollection.pack',
+    ol.geom2.LineStringCollection.pack);
+
+
+goog.exportSymbol(
+    'ol.geom2.PointCollection',
+    ol.geom2.PointCollection);
+
+
+goog.exportSymbol(
+    'ol.geom2.PointCollection.createEmpty',
+    ol.geom2.PointCollection.createEmpty);
+
+
+goog.exportSymbol(
+    'ol.geom2.PointCollection.pack',
+    ol.geom2.PointCollection.pack);
+goog.exportProperty(
+    ol.geom2.PointCollection.prototype,
+    'add',
+    ol.geom2.PointCollection.prototype.add);
+
+
+goog.exportSymbol(
+    'ol.inherits',
+    ol.inherits);
+
+
 
 /**
  * @constructor
@@ -985,13 +1143,9 @@ goog.exportSymbol(
  */
 ol.interaction.DragRotateAndZoomExport = function(options) {
   /** @type {ol.interaction.DragRotateAndZoomOptions} */
-  var arg;
+  var arg = /** @type {ol.interaction.DragRotateAndZoomOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      condition: options.condition
-    };
-  } else {
-    arg = /** @type {ol.interaction.DragRotateAndZoomOptions} */ (options);
+    arg.condition = options.condition;
   }
   goog.base(this, arg);
 };
@@ -1046,19 +1200,15 @@ goog.exportSymbol(
  */
 ol.layer.ImageLayerExport = function(options) {
   /** @type {ol.layer.LayerOptions} */
-  var arg;
+  var arg = /** @type {ol.layer.LayerOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      brightness: options.brightness,
-      contrast: options.contrast,
-      hue: options.hue,
-      opacity: options.opacity,
-      saturation: options.saturation,
-      source: options.source,
-      visible: options.visible
-    };
-  } else {
-    arg = /** @type {ol.layer.LayerOptions} */ (options);
+    arg.brightness = options.brightness;
+    arg.contrast = options.contrast;
+    arg.hue = options.hue;
+    arg.opacity = options.opacity;
+    arg.saturation = options.saturation;
+    arg.source = options.source;
+    arg.visible = options.visible;
   }
   goog.base(this, arg);
 };
@@ -1070,6 +1220,43 @@ goog.exportSymbol(
     ol.layer.ImageLayerExport);
 
 
+goog.exportSymbol(
+    'ol.layer.Layer',
+    ol.layer.Layer);
+goog.exportProperty(
+    ol.layer.Layer.prototype,
+    'getSource',
+    ol.layer.Layer.prototype.getSource);
+
+
+
+/**
+ * @constructor
+ * @extends {ol.layer.LayerGroup}
+ * @param {olx.layer.LayerGroupOptionsExtern} options Options.
+ */
+ol.layer.LayerGroupExport = function(options) {
+  /** @type {ol.layer.LayerGroupOptions} */
+  var arg = /** @type {ol.layer.LayerGroupOptions} */ (options);
+  if (goog.isDefAndNotNull(options)) {
+    arg.brightness = options.brightness;
+    arg.contrast = options.contrast;
+    arg.hue = options.hue;
+    arg.layers = options.layers;
+    arg.opacity = options.opacity;
+    arg.saturation = options.saturation;
+    arg.visible = options.visible;
+  }
+  goog.base(this, arg);
+};
+goog.inherits(
+    ol.layer.LayerGroupExport,
+    ol.layer.LayerGroup);
+goog.exportSymbol(
+    'ol.layer.LayerGroup',
+    ol.layer.LayerGroupExport);
+
+
 
 /**
  * @constructor
@@ -1078,20 +1265,16 @@ goog.exportSymbol(
  */
 ol.layer.TileLayerExport = function(options) {
   /** @type {ol.layer.TileLayerOptions} */
-  var arg;
+  var arg = /** @type {ol.layer.TileLayerOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      brightness: options.brightness,
-      contrast: options.contrast,
-      hue: options.hue,
-      opacity: options.opacity,
-      preload: options.preload,
-      saturation: options.saturation,
-      source: options.source,
-      visible: options.visible
-    };
-  } else {
-    arg = /** @type {ol.layer.TileLayerOptions} */ (options);
+    arg.brightness = options.brightness;
+    arg.contrast = options.contrast;
+    arg.hue = options.hue;
+    arg.opacity = options.opacity;
+    arg.preload = options.preload;
+    arg.saturation = options.saturation;
+    arg.source = options.source;
+    arg.visible = options.visible;
   }
   goog.base(this, arg);
 };
@@ -1111,16 +1294,13 @@ goog.exportSymbol(
  */
 ol.layer.VectorExport = function(options) {
   /** @type {ol.layer.VectorLayerOptions} */
-  var arg;
+  var arg = /** @type {ol.layer.VectorLayerOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      opacity: options.opacity,
-      source: options.source,
-      style: options.style,
-      visible: options.visible
-    };
-  } else {
-    arg = /** @type {ol.layer.VectorLayerOptions} */ (options);
+    arg.opacity = options.opacity;
+    arg.source = options.source;
+    arg.style = options.style;
+    arg.transformFeatureInfo = options.transformFeatureInfo;
+    arg.visible = options.visible;
   }
   goog.base(this, arg);
 };
@@ -1130,19 +1310,74 @@ goog.inherits(
 goog.exportSymbol(
     'ol.layer.Vector',
     ol.layer.VectorExport);
+
+
+goog.exportSymbol(
+    'ol.layer.VectorLayer2',
+    ol.layer.VectorLayer2);
+
+
+
+/**
+ * @constructor
+ * @extends {ol.layer.VideoTileLayer}
+ * @param {olx.layer.VideoTileLayerOptionsExtern} options Options.
+ */
+ol.layer.VideoTileLayerExport = function(options) {
+  /** @type {ol.layer.VideoTileLayerOptions} */
+  var arg = /** @type {ol.layer.VideoTileLayerOptions} */ (options);
+  if (goog.isDefAndNotNull(options)) {
+    arg.brightness = options.brightness;
+    arg.contrast = options.contrast;
+    arg.hue = options.hue;
+    arg.opacity = options.opacity;
+    arg.preload = options.preload;
+    arg.saturation = options.saturation;
+    arg.source = options.source;
+    arg.visible = options.visible;
+  }
+  goog.base(this, arg);
+};
+goog.inherits(
+    ol.layer.VideoTileLayerExport,
+    ol.layer.VideoTileLayer);
+goog.exportSymbol(
+    'ol.layer.VideoTileLayer',
+    ol.layer.VideoTileLayerExport);
+
+
+goog.exportSymbol(
+    'ol.parser.GPX',
+    ol.parser.GPX);
 goog.exportProperty(
-    ol.layer.Vector.prototype,
-    'parseFeatures',
-    ol.layer.Vector.prototype.parseFeatures);
+    ol.parser.GPX.prototype,
+    'read',
+    ol.parser.GPX.prototype.read);
+goog.exportProperty(
+    ol.parser.GPX.prototype,
+    'write',
+    ol.parser.GPX.prototype.write);
 
 
 goog.exportSymbol(
     'ol.parser.GeoJSON',
     ol.parser.GeoJSON);
 goog.exportProperty(
+    ol.parser.GeoJSON,
+    'read',
+    ol.parser.GeoJSON.read);
+goog.exportProperty(
+    ol.parser.GeoJSON,
+    'write',
+    ol.parser.GeoJSON.write);
+goog.exportProperty(
     ol.parser.GeoJSON.prototype,
     'read',
     ol.parser.GeoJSON.prototype.read);
+goog.exportProperty(
+    ol.parser.GeoJSON.prototype,
+    'write',
+    ol.parser.GeoJSON.prototype.write);
 
 
 goog.exportSymbol(
@@ -1156,6 +1391,66 @@ goog.exportProperty(
     ol.parser.KML.prototype,
     'write',
     ol.parser.KML.prototype.write);
+
+
+goog.exportSymbol(
+    'ol.parser.TopoJSON',
+    ol.parser.TopoJSON);
+goog.exportProperty(
+    ol.parser.TopoJSON,
+    'read',
+    ol.parser.TopoJSON.read);
+goog.exportProperty(
+    ol.parser.TopoJSON.prototype,
+    'read',
+    ol.parser.TopoJSON.prototype.read);
+
+
+goog.exportSymbol(
+    'ol.parser.WKT',
+    ol.parser.WKT);
+goog.exportProperty(
+    ol.parser.WKT,
+    'read',
+    ol.parser.WKT.read);
+goog.exportProperty(
+    ol.parser.WKT,
+    'write',
+    ol.parser.WKT.write);
+goog.exportProperty(
+    ol.parser.WKT.prototype,
+    'read',
+    ol.parser.WKT.prototype.read);
+goog.exportProperty(
+    ol.parser.WKT.prototype,
+    'write',
+    ol.parser.WKT.prototype.write);
+
+
+goog.exportSymbol(
+    'ol.parser.ogc.GML_v2',
+    ol.parser.ogc.GML_v2);
+goog.exportProperty(
+    ol.parser.ogc.GML_v2.prototype,
+    'read',
+    ol.parser.ogc.GML_v2.prototype.read);
+goog.exportProperty(
+    ol.parser.ogc.GML_v2.prototype,
+    'write',
+    ol.parser.ogc.GML_v2.prototype.write);
+
+
+goog.exportSymbol(
+    'ol.parser.ogc.GML_v3',
+    ol.parser.ogc.GML_v3);
+goog.exportProperty(
+    ol.parser.ogc.GML_v3.prototype,
+    'read',
+    ol.parser.ogc.GML_v3.prototype.read);
+goog.exportProperty(
+    ol.parser.ogc.GML_v3.prototype,
+    'write',
+    ol.parser.ogc.GML_v3.prototype.write);
 
 
 goog.exportSymbol(
@@ -1177,43 +1472,43 @@ goog.exportProperty(
 
 
 goog.exportSymbol(
-    'ol.projection.addCommonProjections',
-    ol.projection.addCommonProjections);
+    'ol.proj.addCommonProjections',
+    ol.proj.addCommonProjections);
 
 
 goog.exportSymbol(
-    'ol.projection.addProjection',
-    ol.projection.addProjection);
+    'ol.proj.addProjection',
+    ol.proj.addProjection);
 
 
 goog.exportSymbol(
-    'ol.projection.configureProj4jsProjection',
-    ol.projection.configureProj4jsProjection);
+    'ol.proj.configureProj4jsProjection',
+    ol.proj.configureProj4jsProjection);
 
 
 goog.exportSymbol(
-    'ol.projection.get',
-    ol.projection.get);
+    'ol.proj.get',
+    ol.proj.get);
 
 
 goog.exportSymbol(
-    'ol.projection.getTransform',
-    ol.projection.getTransform);
+    'ol.proj.getTransform',
+    ol.proj.getTransform);
 
 
 goog.exportSymbol(
-    'ol.projection.getTransformFromProjections',
-    ol.projection.getTransformFromProjections);
+    'ol.proj.getTransformFromProjections',
+    ol.proj.getTransformFromProjections);
 
 
 goog.exportSymbol(
-    'ol.projection.transform',
-    ol.projection.transform);
+    'ol.proj.transform',
+    ol.proj.transform);
 
 
 goog.exportSymbol(
-    'ol.projection.transformWithProjections',
-    ol.projection.transformWithProjections);
+    'ol.proj.transformWithProjections',
+    ol.proj.transformWithProjections);
 goog.exportProperty(
     ol.renderer.canvas.Map.prototype,
     'getCanvas',
@@ -1228,15 +1523,11 @@ goog.exportProperty(
  */
 ol.source.BingMapsExport = function(options) {
   /** @type {ol.source.BingMapsOptions} */
-  var arg;
+  var arg = /** @type {ol.source.BingMapsOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      culture: options.culture,
-      key: options.key,
-      style: options.style
-    };
-  } else {
-    arg = /** @type {ol.source.BingMapsOptions} */ (options);
+    arg.culture = options.culture;
+    arg.key = options.key;
+    arg.style = options.style;
   }
   goog.base(this, arg);
 };
@@ -1256,15 +1547,11 @@ goog.exportSymbol(
  */
 ol.source.DebugTileSourceExport = function(options) {
   /** @type {ol.source.DebugTileSourceOptions} */
-  var arg;
+  var arg = /** @type {ol.source.DebugTileSourceOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      extent: options.extent,
-      projection: options.projection,
-      tileGrid: options.tileGrid
-    };
-  } else {
-    arg = /** @type {ol.source.DebugTileSourceOptions} */ (options);
+    arg.extent = options.extent;
+    arg.projection = options.projection;
+    arg.tileGrid = options.tileGrid;
   }
   goog.base(this, arg);
 };
@@ -1307,20 +1594,16 @@ goog.exportProperty(
  */
 ol.source.SingleImageWMSExport = function(options) {
   /** @type {ol.source.SingleImageWMSOptions} */
-  var arg;
+  var arg = /** @type {ol.source.SingleImageWMSOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      attributions: options.attributions,
-      crossOrigin: options.crossOrigin,
-      extent: options.extent,
-      params: options.params,
-      projection: options.projection,
-      ratio: options.ratio,
-      resolutions: options.resolutions,
-      url: options.url
-    };
-  } else {
-    arg = /** @type {ol.source.SingleImageWMSOptions} */ (options);
+    arg.attributions = options.attributions;
+    arg.crossOrigin = options.crossOrigin;
+    arg.extent = options.extent;
+    arg.params = options.params;
+    arg.projection = options.projection;
+    arg.ratio = options.ratio;
+    arg.resolutions = options.resolutions;
+    arg.url = options.url;
   }
   goog.base(this, arg);
 };
@@ -1340,17 +1623,13 @@ goog.exportSymbol(
  */
 ol.source.StamenExport = function(options) {
   /** @type {ol.source.StamenOptions} */
-  var arg;
+  var arg = /** @type {ol.source.StamenOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      layer: options.layer,
-      maxZoom: options.maxZoom,
-      minZoom: options.minZoom,
-      opaque: options.opaque,
-      url: options.url
-    };
-  } else {
-    arg = /** @type {ol.source.StamenOptions} */ (options);
+    arg.layer = options.layer;
+    arg.maxZoom = options.maxZoom;
+    arg.minZoom = options.minZoom;
+    arg.opaque = options.opaque;
+    arg.url = options.url;
   }
   goog.base(this, arg);
 };
@@ -1370,19 +1649,15 @@ goog.exportSymbol(
  */
 ol.source.StaticImageExport = function(options) {
   /** @type {ol.source.StaticImageOptions} */
-  var arg;
+  var arg = /** @type {ol.source.StaticImageOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      attributions: options.attributions,
-      crossOrigin: options.crossOrigin,
-      extent: options.extent,
-      imageExtent: options.imageExtent,
-      imageSize: options.imageSize,
-      projection: options.projection,
-      url: options.url
-    };
-  } else {
-    arg = /** @type {ol.source.StaticImageOptions} */ (options);
+    arg.attributions = options.attributions;
+    arg.crossOrigin = options.crossOrigin;
+    arg.extent = options.extent;
+    arg.imageExtent = options.imageExtent;
+    arg.imageSize = options.imageSize;
+    arg.projection = options.projection;
+    arg.url = options.url;
   }
   goog.base(this, arg);
 };
@@ -1402,14 +1677,10 @@ goog.exportSymbol(
  */
 ol.source.TileJSONExport = function(options) {
   /** @type {ol.source.TileJSONOptions} */
-  var arg;
+  var arg = /** @type {ol.source.TileJSONOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      crossOrigin: options.crossOrigin,
-      url: options.url
-    };
-  } else {
-    arg = /** @type {ol.source.TileJSONOptions} */ (options);
+    arg.crossOrigin = options.crossOrigin;
+    arg.url = options.url;
   }
   goog.base(this, arg);
 };
@@ -1421,29 +1692,34 @@ goog.exportSymbol(
     ol.source.TileJSONExport);
 
 
+goog.exportSymbol(
+    'ol.source.TileSource',
+    ol.source.TileSource);
+goog.exportProperty(
+    ol.source.TileSource.prototype,
+    'getTileGrid',
+    ol.source.TileSource.prototype.getTileGrid);
+
+
 
 /**
  * @constructor
  * @extends {ol.source.TiledVideoWMS}
- * @param {olx.source.TiledWMSOptionsExtern} options Options.
+ * @param {olx.source.TiledVideoWMSOptionsExtern} options Options.
  */
 ol.source.TiledVideoWMSExport = function(options) {
-  /** @type {ol.source.TiledWMSOptions} */
-  var arg;
+  /** @type {ol.source.TiledVideoWMSOptions} */
+  var arg = /** @type {ol.source.TiledVideoWMSOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      attributions: options.attributions,
-      crossOrigin: options.crossOrigin,
-      extent: options.extent,
-      maxZoom: options.maxZoom,
-      params: options.params,
-      projection: options.projection,
-      tileGrid: options.tileGrid,
-      url: options.url,
-      urls: options.urls
-    };
-  } else {
-    arg = /** @type {ol.source.TiledWMSOptions} */ (options);
+    arg.attributions = options.attributions;
+    arg.crossOrigin = options.crossOrigin;
+    arg.extent = options.extent;
+    arg.maxZoom = options.maxZoom;
+    arg.params = options.params;
+    arg.projection = options.projection;
+    arg.tileGrid = options.tileGrid;
+    arg.url = options.url;
+    arg.urls = options.urls;
   }
   goog.base(this, arg);
 };
@@ -1463,21 +1739,17 @@ goog.exportSymbol(
  */
 ol.source.TiledWMSExport = function(options) {
   /** @type {ol.source.TiledWMSOptions} */
-  var arg;
+  var arg = /** @type {ol.source.TiledWMSOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      attributions: options.attributions,
-      crossOrigin: options.crossOrigin,
-      extent: options.extent,
-      maxZoom: options.maxZoom,
-      params: options.params,
-      projection: options.projection,
-      tileGrid: options.tileGrid,
-      url: options.url,
-      urls: options.urls
-    };
-  } else {
-    arg = /** @type {ol.source.TiledWMSOptions} */ (options);
+    arg.attributions = options.attributions;
+    arg.crossOrigin = options.crossOrigin;
+    arg.extent = options.extent;
+    arg.maxZoom = options.maxZoom;
+    arg.params = options.params;
+    arg.projection = options.projection;
+    arg.tileGrid = options.tileGrid;
+    arg.url = options.url;
+    arg.urls = options.urls;
   }
   goog.base(this, arg);
 };
@@ -1493,20 +1765,19 @@ goog.exportSymbol(
 /**
  * @constructor
  * @extends {ol.source.Vector}
- * @param {olx.source.SourceOptionsExtern} options Options.
+ * @param {olx.source.VectorOptionsExtern} options Options.
  */
 ol.source.VectorExport = function(options) {
-  /** @type {ol.source.SourceOptions} */
-  var arg;
+  /** @type {ol.source.VectorOptions} */
+  var arg = /** @type {ol.source.VectorOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      attributions: options.attributions,
-      extent: options.extent,
-      logo: options.logo,
-      projection: options.projection
-    };
-  } else {
-    arg = /** @type {ol.source.SourceOptions} */ (options);
+    arg.attributions = options.attributions;
+    arg.data = options.data;
+    arg.extent = options.extent;
+    arg.logo = options.logo;
+    arg.parser = options.parser;
+    arg.projection = options.projection;
+    arg.url = options.url;
   }
   goog.base(this, arg);
 };
@@ -1518,6 +1789,21 @@ goog.exportSymbol(
     ol.source.VectorExport);
 
 
+goog.exportSymbol(
+    'ol.source.VectorSource2',
+    ol.source.VectorSource2);
+
+
+goog.exportSymbol(
+    'ol.source.VideoTileSource',
+    ol.source.VideoTileSource);
+
+
+goog.exportSymbol(
+    'ol.source.WMSGetFeatureInfoMethod',
+    ol.source.WMSGetFeatureInfoMethod);
+
+
 
 /**
  * @constructor
@@ -1526,26 +1812,22 @@ goog.exportSymbol(
  */
 ol.source.WMTSExport = function(options) {
   /** @type {ol.source.WMTSOptions} */
-  var arg;
+  var arg = /** @type {ol.source.WMTSOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      attributions: options.attributions,
-      crossOrigin: options.crossOrigin,
-      dimensions: options.dimensions,
-      extent: options.extent,
-      format: options.format,
-      layer: options.layer,
-      matrixSet: options.matrixSet,
-      maxZoom: options.maxZoom,
-      projection: options.projection,
-      requestEncoding: options.requestEncoding,
-      style: options.style,
-      tileGrid: options.tileGrid,
-      url: options.url,
-      urls: options.urls
-    };
-  } else {
-    arg = /** @type {ol.source.WMTSOptions} */ (options);
+    arg.attributions = options.attributions;
+    arg.crossOrigin = options.crossOrigin;
+    arg.dimensions = options.dimensions;
+    arg.extent = options.extent;
+    arg.format = options.format;
+    arg.layer = options.layer;
+    arg.matrixSet = options.matrixSet;
+    arg.maxZoom = options.maxZoom;
+    arg.projection = options.projection;
+    arg.requestEncoding = options.requestEncoding;
+    arg.style = options.style;
+    arg.tileGrid = options.tileGrid;
+    arg.url = options.url;
+    arg.urls = options.urls;
   }
   goog.base(this, arg);
 };
@@ -1570,17 +1852,13 @@ goog.exportSymbol(
  */
 ol.style.IconExport = function(options) {
   /** @type {ol.style.IconOptions} */
-  var arg;
+  var arg = /** @type {ol.style.IconOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      height: options.height,
-      opacity: options.opacity,
-      rotation: options.rotation,
-      url: options.url,
-      width: options.width
-    };
-  } else {
-    arg = /** @type {ol.style.IconOptions} */ (options);
+    arg.height = options.height;
+    arg.opacity = options.opacity;
+    arg.rotation = options.rotation;
+    arg.url = options.url;
+    arg.width = options.width;
   }
   goog.base(this, arg);
 };
@@ -1605,15 +1883,11 @@ goog.exportSymbol(
  */
 ol.style.LineExport = function(options) {
   /** @type {ol.style.LineOptions} */
-  var arg;
+  var arg = /** @type {ol.style.LineOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      opacity: options.opacity,
-      strokeColor: options.strokeColor,
-      strokeWidth: options.strokeWidth
-    };
-  } else {
-    arg = /** @type {ol.style.LineOptions} */ (options);
+    arg.strokeColor = options.strokeColor;
+    arg.strokeOpacity = options.strokeOpacity;
+    arg.strokeWidth = options.strokeWidth;
   }
   goog.base(this, arg);
 };
@@ -1633,16 +1907,12 @@ goog.exportSymbol(
  */
 ol.style.PolygonExport = function(options) {
   /** @type {ol.style.PolygonOptions} */
-  var arg;
+  var arg = /** @type {ol.style.PolygonOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      fillColor: options.fillColor,
-      opacity: options.opacity,
-      strokeColor: options.strokeColor,
-      strokeWidth: options.strokeWidth
-    };
-  } else {
-    arg = /** @type {ol.style.PolygonOptions} */ (options);
+    arg.fillColor = options.fillColor;
+    arg.opacity = options.opacity;
+    arg.strokeColor = options.strokeColor;
+    arg.strokeWidth = options.strokeWidth;
   }
   goog.base(this, arg);
 };
@@ -1662,14 +1932,10 @@ goog.exportSymbol(
  */
 ol.style.RuleExport = function(options) {
   /** @type {ol.style.RuleOptions} */
-  var arg;
+  var arg = /** @type {ol.style.RuleOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      filter: options.filter,
-      symbolizers: options.symbolizers
-    };
-  } else {
-    arg = /** @type {ol.style.RuleOptions} */ (options);
+    arg.filter = options.filter;
+    arg.symbolizers = options.symbolizers;
   }
   goog.base(this, arg);
 };
@@ -1689,18 +1955,15 @@ goog.exportSymbol(
  */
 ol.style.ShapeExport = function(options) {
   /** @type {ol.style.ShapeOptions} */
-  var arg;
+  var arg = /** @type {ol.style.ShapeOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      fillColor: options.fillColor,
-      opacity: options.opacity,
-      size: options.size,
-      strokeColor: options.strokeColor,
-      strokeWidth: options.strokeWidth,
-      type: options.type
-    };
-  } else {
-    arg = /** @type {ol.style.ShapeOptions} */ (options);
+    arg.fillColor = options.fillColor;
+    arg.fillOpacity = options.fillOpacity;
+    arg.size = options.size;
+    arg.strokeColor = options.strokeColor;
+    arg.strokeOpacity = options.strokeOpacity;
+    arg.strokeWidth = options.strokeWidth;
+    arg.type = options.type;
   }
   goog.base(this, arg);
 };
@@ -1729,13 +1992,9 @@ goog.exportProperty(
  */
 ol.style.StyleExport = function(options) {
   /** @type {ol.style.StyleOptions} */
-  var arg;
+  var arg = /** @type {ol.style.StyleOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      rules: options.rules
-    };
-  } else {
-    arg = /** @type {ol.style.StyleOptions} */ (options);
+    arg.rules = options.rules;
   }
   goog.base(this, arg);
 };
@@ -1750,23 +2009,45 @@ goog.exportSymbol(
 
 /**
  * @constructor
+ * @extends {ol.style.Text}
+ * @param {olx.style.TextOptionsExtern} options Options.
+ */
+ol.style.TextExport = function(options) {
+  /** @type {ol.style.TextOptions} */
+  var arg = /** @type {ol.style.TextOptions} */ (options);
+  if (goog.isDefAndNotNull(options)) {
+    arg.color = options.color;
+    arg.fontFamily = options.fontFamily;
+    arg.fontSize = options.fontSize;
+    arg.opacity = options.opacity;
+    arg.text = options.text;
+  }
+  goog.base(this, arg);
+};
+goog.inherits(
+    ol.style.TextExport,
+    ol.style.Text);
+goog.exportSymbol(
+    'ol.style.Text',
+    ol.style.TextExport);
+
+
+
+/**
+ * @constructor
  * @extends {ol.tilegrid.TileGrid}
  * @param {olx.tilegrid.TileGridOptionsExtern} options Options.
  */
 ol.tilegrid.TileGridExport = function(options) {
   /** @type {ol.tilegrid.TileGridOptions} */
-  var arg;
+  var arg = /** @type {ol.tilegrid.TileGridOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      minZoom: options.minZoom,
-      origin: options.origin,
-      origins: options.origins,
-      resolutions: options.resolutions,
-      tileSize: options.tileSize,
-      tileSizes: options.tileSizes
-    };
-  } else {
-    arg = /** @type {ol.tilegrid.TileGridOptions} */ (options);
+    arg.minZoom = options.minZoom;
+    arg.origin = options.origin;
+    arg.origins = options.origins;
+    arg.resolutions = options.resolutions;
+    arg.tileSize = options.tileSize;
+    arg.tileSizes = options.tileSizes;
   }
   goog.base(this, arg);
 };
@@ -1776,6 +2057,22 @@ goog.inherits(
 goog.exportSymbol(
     'ol.tilegrid.TileGrid',
     ol.tilegrid.TileGridExport);
+goog.exportProperty(
+    ol.tilegrid.TileGrid.prototype,
+    'getMinZoom',
+    ol.tilegrid.TileGrid.prototype.getMinZoom);
+goog.exportProperty(
+    ol.tilegrid.TileGrid.prototype,
+    'getOrigin',
+    ol.tilegrid.TileGrid.prototype.getOrigin);
+goog.exportProperty(
+    ol.tilegrid.TileGrid.prototype,
+    'getResolutions',
+    ol.tilegrid.TileGrid.prototype.getResolutions);
+goog.exportProperty(
+    ol.tilegrid.TileGrid.prototype,
+    'getTileSize',
+    ol.tilegrid.TileGrid.prototype.getTileSize);
 
 
 
@@ -1786,18 +2083,14 @@ goog.exportSymbol(
  */
 ol.tilegrid.WMTSExport = function(options) {
   /** @type {ol.tilegrid.WMTSOptions} */
-  var arg;
+  var arg = /** @type {ol.tilegrid.WMTSOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      matrixIds: options.matrixIds,
-      origin: options.origin,
-      origins: options.origins,
-      resolutions: options.resolutions,
-      tileSize: options.tileSize,
-      tileSizes: options.tileSizes
-    };
-  } else {
-    arg = /** @type {ol.tilegrid.WMTSOptions} */ (options);
+    arg.matrixIds = options.matrixIds;
+    arg.origin = options.origin;
+    arg.origins = options.origins;
+    arg.resolutions = options.resolutions;
+    arg.tileSize = options.tileSize;
+    arg.tileSizes = options.tileSizes;
   }
   goog.base(this, arg);
 };
@@ -1807,6 +2100,10 @@ goog.inherits(
 goog.exportSymbol(
     'ol.tilegrid.WMTS',
     ol.tilegrid.WMTSExport);
+goog.exportProperty(
+    ol.tilegrid.WMTS.prototype,
+    'getMatrixIds',
+    ol.tilegrid.WMTS.prototype.getMatrixIds);
 
 
 
@@ -1817,13 +2114,9 @@ goog.exportSymbol(
  */
 ol.tilegrid.XYZExport = function(options) {
   /** @type {ol.tilegrid.XYZOptions} */
-  var arg;
+  var arg = /** @type {ol.tilegrid.XYZOptions} */ (options);
   if (goog.isDefAndNotNull(options)) {
-    arg = {
-      maxZoom: options.maxZoom
-    };
-  } else {
-    arg = /** @type {ol.tilegrid.XYZOptions} */ (options);
+    arg.maxZoom = options.maxZoom;
   }
   goog.base(this, arg);
 };
