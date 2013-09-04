@@ -95,6 +95,31 @@
    </tileset>
 
 
+   <source name="src_base" type="wms">
+      <http>
+         <url>http://maps-b.zen.landcareresearch.co.nz/cgi-bin/mapserv?</url>
+      </http>
+      <getmap>
+         <params>
+            <FORMAT>image/png</FORMAT>
+            <LAYERS>antarc_hillshade</LAYERS>
+            <MAP>/opt/mapserver/mapfiles/antarctic_topo_130610.map</MAP>
+            <TRANSPARENT>true</TRANSPARENT>
+         </params>
+      </getmap>
+   </source>
+   <tileset name="base_cache">
+      <metadata>
+         <title>Antarctic - Videos</title>
+         <abstract>Abstract</abstract>
+      </metadata>
+      <source>src_base</source>
+      <cache>disk</cache>
+      <format>PNG</format>
+      <grid>antarctic</grid>
+      <metatile>5 5</metatile>
+      <metabuffer>10</metabuffer>
+   </tileset>
 
 
    <source name="src_ice_1979_01" type="wms">
