@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- see the accompanying mapcache.xml.sample for a fully commented configuration file -->
+
+<mapcache>
+   <cache name="disk" type="disk">
+     <!--base>/mnt/san/geocache</base-->
+     <!--<base>/var/mapcache</base>-->
+     <!--base>/landcare/cache</base-->
+     <base>/mnt/xfs_storage/antarctic_ice</base>
+     <symlink_blank/>
+     <lock_dir>/tmp</lock_dir>
+   </cache>
+
+   <source name="vmap0" type="wms">
+      <getmap>
+         <params>
+            <FORMAT>image/png</FORMAT>
+            <LAYERS>basic</LAYERS>
+         </params>
+      </getmap>
+      
+      <http>
+         <url>http://vmap0.tiles.osgeo.org/wms/vmap0</url>
+      </http>
+   </source>
+   
+   <tileset name="test">
+      <source>vmap0</source>
+      <cache>disk</cache>
+      <grid>WGS84</grid>
+      <grid>g</grid>
+      <format>PNG</format>
+      <metatile>5 5</metatile>
+      <metabuffer>10</metabuffer>
+      <expires>3600</expires>
+   </tileset>
+
+
+   <default_format>JPEG</default_format>
+
+   <service type="wms" enabled="true">
+      <full_wms>assemble</full_wms>
+      <resample_mode>bilinear</resample_mode>
+      <format>JPEG</format>
+      <maxsize>4096</maxsize>
+   </service>
+   <service type="wmts" enabled="true"/>
+   <service type="tms" enabled="true"/>
+   <service type="kml" enabled="true"/>
+   <service type="gmaps" enabled="true"/>
+   <service type="ve" enabled="true"/>
+   <service type="demo" enabled="true"/>
+
+   <errors>report</errors>
+   <lock_dir>/tmp</lock_dir>
+
+
+
+   <grid name="antarctic">
+      <metadata>
+         <title>A Title</title>
+      </metadata>
+      <srs>EPSG:3031</srs>
+      <size>256 256</size>
+      <extent>-5000000 -5000000 5000000 5000000</extent>
+      <!--resolutions>2822.2206982230455 1411.1103491115227 705.5551745557614 352.7775872778807 176.38879363894034 88.19439681947017 35.27775872778806 17.63887936389403 8.819439681947015 3.527775872778806</resolutions-->
+      <resolutions>11288.911466711823 5644.455733355911 2822.2278666779557 1411.1139333389779</resolutions>
+   </grid>
+
+   <source name="src_ice_videos" type="wms">
+      <http>
+         <url>http://localhost/cgi-bin/mapserv?</url>
+      </http>
+      <getmap>
+         <params>
+            <FORMAT>image/png</FORMAT>
+            <LAYERS>antarc_sea_ice_extent</LAYERS>
+            <MAP>/opt/mapserver/mapfiles/antarctic_ice.map</MAP>
+            <TRANSPARENT>true</TRANSPARENT>
+         </params>
+      </getmap>
+   </source>
+   <tileset name="ice_videos_cache">
+      <metadata>
+         <title>Antarctic - Videos</title>
+         <abstract>Abstract</abstract>
+      </metadata>
+      <source>src_ice_videos</source>
+      <cache>disk</cache>
+      <format>PNG</format>
+      <grid>antarctic</grid>
+      <metatile>5 5</metatile>
+      <metabuffer>10</metabuffer>
+   </tileset>
+
+
+
+

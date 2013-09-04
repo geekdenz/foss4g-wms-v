@@ -1,0 +1,9 @@
+
+
+
+
+   <format name="PNG_BEST" type="PNG">
+      <compression>best</compression>
+      <transparent>PNG_BEST</transparent>
+   </format>
+</mapcache>

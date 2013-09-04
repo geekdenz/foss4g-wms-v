@@ -1,0 +1,27 @@
+   <source name="src_ice_{_year_}_{_month_}" type="wms">
+      <http>
+         <url>http://localhost/cgi-bin/mapserv?</url>
+      </http>
+      <getmap>
+         <params>
+            <FORMAT>image/png</FORMAT>
+            <LAYERS>antarc_sea_ice_extent</LAYERS>
+            <MAP>/opt/mapserver/mapfiles/antarctic_ice.map</MAP>
+            <TRANSPARENT>true</TRANSPARENT>
+            <TIME>{_year_}-{_month_}-01</TIME>
+         </params>
+      </getmap>
+   </source>
+   <tileset name="ice_{_year_}_{_month_}">
+      <metadata>
+         <title>Antarctic Ice {_year_}-{_month_}</title>
+         <abstract>Abstract</abstract>
+      </metadata>
+      <source>src_ice_{_year_}_{_month_}</source>
+      <cache>disk</cache>
+      <format>PNG</format>
+      <grid>antarctic</grid>
+      <metatile>5 5</metatile>
+      <metabuffer>10</metabuffer>
+   </tileset>
+
