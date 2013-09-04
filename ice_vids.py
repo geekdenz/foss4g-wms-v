@@ -10,7 +10,7 @@ month_start = 1
 year_end = 2013
 month_end = 6
 minz = 0
-maxz = 3
+maxz = 1
 execute = False
 maxit = 999999999999999999
 #maxit = 10
@@ -43,9 +43,9 @@ def avc(year, month, filename, i):
     qwe = 'ice_%d_%02d' % (year, month)
     f = filename.replace(asd, qwe)
     newname = '%s/%d.%s' % (tmp, i, ext)
-    #print 'cp %s %s' % (f, newname)
-    copy(f, newname)
-    
+    cmd = 'cp -f %s %s' % (f, newname)
+    print cmd
+    call(cmd.split(' '))
 
 def process(filename):
     global year_start, year_end, month_start, month_end, towalk
@@ -70,17 +70,22 @@ def process(filename):
     output = f.replace(ext, videoext)
     call(['mkdir','-p',path.dirname(output)])
     cmd = '%s %s %s/%%d.%s -b:v %s %s' % (avconv, avparams, tmp, ext, videobitrate, output)
-    call(cmd.split(' '))
+    print '     #### NEW AVCONV ####'
+    print cmd
+    #call(cmd.split(' '))
 
-for rootdir, dir, files in walk(towalk.replace('{_year_}', '%d' % myyear).replace('{_month_}', '%02d' % mymonth)):
+mytowalk = towalk.replace('{_year_}', '%d' % myyear).replace('{_month_}', '%02d' % mymonth)
+print mytowalk
+
+count = 0
+for rootdir, dir, files in walk(mytowalk):
     for filename in files:
         filename = path.join(rootdir, filename)
         if not path.isfile(filename) or 'blank' in filename:
             continue
         if maxit <= 0:
             break
-        print ''
-        print '        ##########            '
-        print ''
         maxit = maxit - 1
+        count += 1
         process(filename)
+#print count

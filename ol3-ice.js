@@ -28,14 +28,14 @@ function createVideoUrl(x, y, z) {
     if (x < 0 || y < 0) {
         return null;
     }
-    var url = 'http://projects.local/mapcache/';
+    var url = 'http://projects.local/antarctic/';
     var s = '0'+ z +'/'+ 
             pad(Math.floor(x/1000000),3) +'/'+ 
             pad(Math.floor(x/1000) % 1000,3) +'/'+ 
             pad(x % 1000,3) +'/'+
             pad(Math.floor(y/1000000),3) +'/'+ 
             pad(Math.floor(y/1000) % 1000,3) +'/'+ 
-            pad(y % 1000,3) +'.mp4';
+            pad(y % 1000,3) +'.webm';
     //var s = '0'+ z +'/'+ slashify(pad(x, 9)) +'/'+ slashify(pad(y, 9)) +'.png';
     return url + s;
 }

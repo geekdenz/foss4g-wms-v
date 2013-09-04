@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <style>
+            #d {
+                width: 1024px;
+                padding: 0;
+                margin: 0;
+            }
+            #d img {
+                padding: 0;
+                margin: 0;
+                width: 256px;
+                height: 256px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="d">
+        </div>
+        <script>
+            // 01/000/000/003/000/000/004.png
+            var zeroPad = function(num, len, radix) {
+                var str = num.toString(radix || 10);
+                while (str.length < len) {      
+                    str = "0" + str;
+                }
+                return str;
+            }    
+
+            function get(tileX,tileY) {
+                var tileZ = 0;
+                var url = 'http://projects.local/antarctic/'+ zeroPad(tileZ, 2) +'/'+
+                    zeroPad(parseInt(tileX / 1000000), 3) +'/'+
+                    zeroPad((parseInt(tileX / 1000) % 1000), 3) +'/'+
+                    zeroPad((parseInt(tileX) % 1000), 3) +'/'+
+                    zeroPad(parseInt(tileY / 1000000), 3) +'/'+
+                    zeroPad((parseInt(tileY / 1000) % 1000), 3) +'/'+
+                    zeroPad((parseInt(tileY) % 1000), 3) + '.webm';
+                return url;
+            }
+            function a(x,y) {
+                var i = document.createElement('video');
+                i.src = get(x,y);
+                document.getElementById('d').appendChild(i);
+            }
+            for (var y = 3; y >= 0; --y) {
+                for (var x = 0; x < 4; x++) {
+                    a(x,y);
+                }
+            }
+        </script>
+    </body>
+</html>
