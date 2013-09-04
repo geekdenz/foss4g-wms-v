@@ -72,7 +72,7 @@ def process(filename):
     cmd = '%s %s %s/%%d.%s -b:v %s %s' % (avconv, avparams, tmp, ext, videobitrate, output)
     print '     #### NEW AVCONV ####'
     print cmd
-    #call(cmd.split(' '))
+    call(cmd.split(' '))
 
 mytowalk = towalk.replace('{_year_}', '%d' % myyear).replace('{_month_}', '%02d' % mymonth)
 print mytowalk
