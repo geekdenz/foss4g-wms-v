@@ -55,21 +55,6 @@ var layers = [
       }),
       extent: extent
     })
-  }),
-  new ol.layer.TileLayer({
-    source: new ol.source.TiledVideoWMS({
-      url: 'http://npm.landcareresearch.co.nz/possums/anim/videoproxy.php?',
-      params: {
-          'LAYERS': 'possum_videos_cache_nztm', 
-          'TILED': true,
-          'VERSION': '1.1.1'
-      },
-      tileGrid: new ol.tilegrid.TileGrid({
-        origin: [1000000, 4700000.0000001],
-        resolutions: resolutions
-      }),
-      extent: extent
-    })
   })
 ];
 var map = new ol.Map({

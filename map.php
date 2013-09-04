@@ -55,6 +55,6 @@
           };
           onresize();
       </script>
-      <script src="wms-v.js" type="text/javascript"></script>
+      <script src="mapcache.js" type="text/javascript"></script>
   </body>
 </html>
