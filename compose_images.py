@@ -24,6 +24,9 @@ maxit = 999999999999999999
 blank = '/media/work_ext4/cache/antarctic_ice/ice_1979_01/antarctic/blanks/5B5400FF.png'
 towalk = '/media/work_ext4/cache/antarctic_ice/ice_{_year_}_{_month_}/antarctic'
 
+search_for = '/antarctic_ice/'
+replace_with = '/antarctic_ice_overlay/'
+
 avconv = "avconv"                                           # ffmpeg or avconv application
 avparams = "-r 12 -i"                                        # avconv parameters before input files and output video
 #videocodec = "libx264"                                      # codec to use when encoding the video
@@ -50,7 +53,7 @@ def avc(year, month, filename, i):
     qwe = 'base_cache'
     base = filename.replace(asd, qwe)
     zxc = 'ice_%d_%02d_o' % (year, month)
-    newname = filename.replace(asd, zxc)
+    newname = filename.replace(asd, zxc).replace(search_for, replace_with)
     cmd = 'convert -composite %s %s /tmp/result1.png' % (blank, base)
     x(cmd)
     #create dir
