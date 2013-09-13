@@ -28,7 +28,7 @@ function createVideoUrl(x, y, z) {
     if (x < 0 || y < 0) {
         return null;
     }
-    var url = 'http://projects.local/antarctic/';
+    var url = 'http://projects.local/cache/antarctic_ice_overlay/ice_videos_o/antarctic/';
     var s = '0'+ z +'/'+ 
             pad(Math.floor(x/1000000),3) +'/'+ 
             pad(Math.floor(x/1000) % 1000,3) +'/'+ 
@@ -44,17 +44,27 @@ function getVideos() {
   var videos = map.getElementsByTagName('video');
   return videos;
 }
+var playing = false;
 function play() {
   var videos = getVideos();
   var ii = videos.length;
   while (ii--) {
     videos[ii].play();
   }
+  playing = true;
+}
+function pause() {
+  var videos = getVideos();
+  var ii = videos.length;
+  while (ii--) {
+    videos[ii].pause();
+  }
+  playing = false;
 }
 var view = new ol.View2D({
-    center: [20000000,20001000],
-    zoom: 1,    
-    maxZoom: 6
+    center: [60000000,70001000],
+    zoom: 0,    
+    maxZoom: 2
   });
 var extent = [1000000, 4700000.0000001, 2200000, 6300000];
 var source = new ol.source.ImageTileSource({
@@ -100,22 +110,84 @@ var map = new ol.Map({
 //window.map = map;
 //window.view = view;
 var playButton = document.querySelectorAll('a.play')[0];
+var pauseButton = document.querySelectorAll('a.pause')[0];
 
 playButton.onclick = play;
+pauseButton.onclick = pause;
 
 var el = document.getElementById('s1');
 var s = new goog.ui.Slider;
 s.decorate(el);
-s.setMinimum(2009);
-s.setMaximum(2039);
+s.setMinimum(0);
+s.setMaximum(413);
 s.addEventListener(goog.ui.Component.EventType.CHANGE, function() {
   var value = s.getValue();
   var videos = getVideos();
   var ii = videos.length;
-  var time = (value - 2009) / 6;
+  var time = value/12;
   while (ii--) {
     videos[ii].currentTime = time;
   }
-  document.querySelectorAll('.year')[0].innerHTML = value;
-  console.log(time);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var myv = value / 12;
+  var year = Math.floor(myv);
+  var m = Math.round(12 * (myv - year));
+  var month = months[m];
+  document.querySelectorAll('.year')[0].innerHTML = year + 1979;
+  document.querySelectorAll('.month')[0].innerHTML = month;
+  //console.log(time);
 });
+
+function updateTime(time) {
+  var value = time * 12;
+  s.setValue(value);
+}
+function resize() {
+  var viewportheight = window.innerHeight;
+  document.getElementsByClassName('map')[0].style.height = viewportheight +'px';
+}
+
+function inbetween(value, check, tolerance) {
+  return check - tolerance <= value <= check + tolerance;
+}
+var currentTime = 0;
+function syncVideos() {
+  var vids = getVideos();
+  var ii = vids.length;
+  var len = ii;
+  var maxTime = currentTime;
+  while (ii--) {
+    var v = vids[ii],
+        time = v.currentTime;
+    if (maxTime < time) {
+      maxTime = time;
+    }
+  }
+  while (len--) {
+    var v = vids[len];
+    if (!inbetween(v.currentTime, maxTime, 0.05) && maxTime != 0) {
+      v.currentTime = maxTime;
+      console.log('corrected', maxTime);
+    }
+    if (playing && v.paused) {
+      v.play();
+    }
+  }
+  updateTime(maxTime);
+  currentTime = currentTime > maxTime ? currentTime : maxTime;
+  //console.log(currentTime, maxTime);
+}
+
+setInterval(syncVideos, 500);
+
+/*
+function timeupdate(target) {
+}
+
+function onmove() {
+}
+goog.events.listen(this.viewportSizeMonitor_, goog.events.EventType.RESIZE,                                                                         
+              this.updateSize, false, this);
+*/
+window.resize = resize;
+resize();

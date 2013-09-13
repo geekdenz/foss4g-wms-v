@@ -15,7 +15,7 @@ execute = False
 maxit = 999999999999999999
 #maxit = 10
 
-towalk = '/opt/cache/antarctic_ice/ice_{_year_}_{_month_}/antarctic'
+towalk = '/media/work_ext4/cache/antarctic_ice_overlay/ice_{_year_}_{_month_}_o/antarctic'
 
 avconv = "avconv"                                           # ffmpeg or avconv application
 avparams = "-r 12 -i"                                        # avconv parameters before input files and output video
@@ -35,6 +35,7 @@ mymonth = 1
 call(['mkdir','-p',tmp])
 
 def avc(year, month, filename, i):
+    # avconv -i %d.png -v:b 1000k -v:c libvpx 001.webm
     #global ext,avconv,avparams,videocodec,videobitrate,videoext,towalk,execute
     global towalk, myyear, mymonth, ext
     #mytowalk = towalk.replace('{_year_}', '%d' % year).replace('{_month_}', '%02d' % month)
