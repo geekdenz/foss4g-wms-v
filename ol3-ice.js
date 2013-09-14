@@ -148,7 +148,7 @@ function resize() {
 }
 
 function inbetween(value, check, tolerance) {
-  return check - tolerance <= value <= check + tolerance;
+  return ((check - tolerance) <= value) && (value <= (check + tolerance));
 }
 var currentTime = 0;
 function syncVideos() {
@@ -166,11 +166,12 @@ function syncVideos() {
   while (len--) {
     var v = vids[len];
     if (!inbetween(v.currentTime, maxTime, 0.05) && maxTime != 0) {
+      console.log('correcting', v.currentTime, maxTime);
       v.currentTime = maxTime;
-      console.log('corrected', maxTime);
     }
     if (playing && v.paused) {
       v.play();
+      console.log('play', maxTime, v);
     }
   }
   updateTime(maxTime);
@@ -178,7 +179,7 @@ function syncVideos() {
   //console.log(currentTime, maxTime);
 }
 
-setInterval(syncVideos, 500);
+setInterval(syncVideos, 100);
 
 /*
 function timeupdate(target) {
