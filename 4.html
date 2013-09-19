@@ -11,27 +11,27 @@ video {
     height: 256px;
     float: left;
 }
-video.small {
-    width: 384px;
-}
 div.row {
-    width: 1024px;
+    width: 2048px;
 }
 </style>
 <body>
-<div>
-    <div class="row">
-        <video src="256_0_0.webm" autoplay loop muted></video>
-        <video src="256_1_0.webm" autoplay loop muted></video>
-        <video src="256_2_0.webm" autoplay loop muted></video>
-        <video src="256_3_0.webm" autoplay loop muted></video>
-    </div>
-    <div class="row">
-        <video src="256_0_1.webm" autoplay loop muted></video>
-        <video src="256_1_1.webm" autoplay loop muted></video>
-        <video src="256_2_1.webm" autoplay loop muted></video>
-        <video src="256_3_1.webm" autoplay loop muted></video>
-    </div>
-</div>
+<script>
+var x=8,y=6,b=document.getElementsByTagName('body')[0];
+for (var j = 0; j < y; ++j) {
+    var div = document.createElement('div');
+    div.className = 'row';
+    b.appendChild(div);
+    for (var i = 0; i < x; ++i) {
+        var v = document.createElement('video');
+        v.src = '256_'+ i +'_'+ j +'.webm';
+        v.autoplay = 'autoplay';
+        v.muted = 'muted';
+        div.appendChild(v);
+        console.log(i,j);
+    }
+}
+        
+</script>
 </body>
 </html>

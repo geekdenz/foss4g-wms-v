@@ -28,28 +28,28 @@ function createVideoUrl(x, y, z) {
     if (x < 0 || y < 0) {
         return null;
     }
-    var url = 'http://projects.local/cache/antarctic_ice_overlay/ice_videos_o/antarctic/';
-    var s = '0'+ z +'/'+ 
-            pad(Math.floor(x/1000000),3) +'/'+ 
-            pad(Math.floor(x/1000) % 1000,3) +'/'+ 
-            pad(x % 1000,3) +'/'+
-            pad(Math.floor(y/1000000),3) +'/'+ 
-            pad(Math.floor(y/1000) % 1000,3) +'/'+ 
-            pad(y % 1000,3) +'.webm';
-    //var s = '0'+ z +'/'+ slashify(pad(x, 9)) +'/'+ slashify(pad(y, 9)) +'.png';
+    var url = 'webm/';
+    var myz = z == 0 ? '00_256_' : '01_256_';
+    var invY = z == 0 ? 8 - y : 17 - y;
+    var s = myz + x +'_'+ invY +'.webm';
     return url + s;
 }
 function getVideos() {
-  var map = document.getElementById('map');
-  var videos = map.getElementsByTagName('video');
+  var videos = document.getElementsByTagName('video');
   return videos;
 }
 var playing = false;
 function play() {
   var videos = getVideos();
   var ii = videos.length;
+  var len = ii;
   while (ii--) {
-    videos[ii].play();
+    var v = videos[ii];
+    v.play();
+    v.loop = 'loop';
+    if (ii < len - 1) {
+      v.muted = 'muted';
+    }
   }
   playing = true;
 }
@@ -61,27 +61,24 @@ function pause() {
   }
   playing = false;
 }
+function reset() {
+  var videos = getVideos();
+  var ii = videos.length;
+  while (ii--) {
+    videos[ii].pause();
+    videos[ii].currentTime = 0;
+  }
+  playing = false;
+}
 var view = new ol.View2D({
-    center: [60000000,70001000],
+    center: [53894572.30887301, 333013989.9089727],
     zoom: 0,    
-    maxZoom: 2
+    maxZoom: 1
   });
 var extent = [1000000, 4700000.0000001, 2200000, 6300000];
-var source = new ol.source.ImageTileSource({
-      tileGrid: new ol.tilegrid.XYZ({
-        //origin: [1000000, 4700000.0000001],
-        //origin: [-ol.proj.EPSG3857.HALF_SIZE, ol.proj.EPSG3857.HALF_SIZE],
-        //origin: [0, 0],
-        maxZoom: 9,
-        resolutions: resolutions
-      }),
-      tileUrlFunction: function(opt) {
-        return createUrl(opt.x, opt.y, opt.z);
-      }
-    });
 var videoSource = new ol.source.VideoTileSource({
       tileGrid: new ol.tilegrid.XYZ({
-        maxZoom: 6,
+        maxZoom: 1,
         origin: [1000000, 4700000.0000001],
         resolutions: resolutions
       }),
@@ -111,37 +108,13 @@ var map = new ol.Map({
 //window.view = view;
 var playButton = document.querySelectorAll('a.play')[0];
 var pauseButton = document.querySelectorAll('a.pause')[0];
+var resetButton = document.querySelectorAll('a.reset')[0];
 
 playButton.onclick = play;
 pauseButton.onclick = pause;
+resetButton.onclick = reset;
 
 var el = document.getElementById('s1');
-var s = new goog.ui.Slider;
-s.decorate(el);
-s.setMinimum(0);
-s.setMaximum(413);
-s.addEventListener(goog.ui.Component.EventType.CHANGE, function() {
-  var value = s.getValue();
-  var videos = getVideos();
-  var ii = videos.length;
-  var time = value/12;
-  while (ii--) {
-    videos[ii].currentTime = time;
-  }
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var myv = value / 12;
-  var year = Math.floor(myv);
-  var m = Math.round(12 * (myv - year));
-  var month = months[m];
-  document.querySelectorAll('.year')[0].innerHTML = year + 1979;
-  document.querySelectorAll('.month')[0].innerHTML = month;
-  //console.log(time);
-});
-
-function updateTime(time) {
-  var value = time * 12;
-  s.setValue(value);
-}
 function resize() {
   var viewportheight = window.innerHeight;
   document.getElementsByClassName('map')[0].style.height = viewportheight +'px';
@@ -151,21 +124,87 @@ function inbetween(value, check, tolerance) {
   return ((check - tolerance) <= value) && (value <= (check + tolerance));
 }
 var currentTime = 0;
+function timeupdate(event) {
+  var target = event.target,
+      time = target.currentTime;
+  //console.log('time',time);
+  if (time > currentTime) {
+    currentTime = time;
+    var vids = getVideos();
+    if (target == vids[0]) {
+      var ii = vids.length;
+      while (ii--) {
+        var v = vids[ii];
+        var vtime = v.currentTime;
+        if (vtime < currentTime) {
+          v.currentTime = currentTime;
+        }
+      }
+    }
+  }
+}
 function syncVideos() {
   var vids = getVideos();
   var ii = vids.length;
-  var len = ii;
-  var maxTime = currentTime;
+  //var len = ii;
+  //var maxTime = currentTime;
+  while (ii--) {
+    var v = vids[ii];
+    v.removeEventListener('timeupdate', timeupdate, true, true);
+    v.addEventListener('timeupdate', timeupdate, true, true);
+    if (v.paused && playing) {
+      //v.currentTime = currentTime;
+      //v.play();
+    }
+  }
+  return;
+  if (!len) return;
+  var duration = vids[0].duration - 1/5;
+
+
+  /*
+  if (false && playing) {
+    currentTime += 1/50;
+    if (currentTime > duration) {
+      currentTime = 0;
+    }
+    while (ii--) {
+      var v = vids[ii];
+      if (!inbetween(v.currentTime, currentTime, 1/25)) {
+        v.currentTime = currentTime;
+      }
+    }
+  }
+  */
+
   while (ii--) {
     var v = vids[ii],
         time = v.currentTime;
+    if (v.paused) {
+      maxTime = currentTime;
+      continue;
+    }
     if (maxTime < time) {
       maxTime = time;
+      currentTime = maxTime;
+    }
+    if (ii < len - 1) {
+      v.muted = 'muted';
     }
   }
+  console.log('max', maxTime);
+  return;
   while (len--) {
     var v = vids[len];
-    if (!inbetween(v.currentTime, maxTime, 0.05) && maxTime != 0) {
+    if (v.paused) {
+      v.currentTime = maxTime;
+      v.play();
+    }
+  }
+  return;
+  while (len--) {
+    var v = vids[len];
+    if (!inbetween(v.currentTime, maxTime, 1/25) && maxTime != 0) {
       console.log('correcting', v.currentTime, maxTime);
       v.currentTime = maxTime;
     }
@@ -174,21 +213,23 @@ function syncVideos() {
       console.log('play', maxTime, v);
     }
   }
-  updateTime(maxTime);
   currentTime = currentTime > maxTime ? currentTime : maxTime;
   //console.log(currentTime, maxTime);
 }
 
-//setInterval(syncVideos, 100);
-
-/*
-function timeupdate(target) {
+//setInterval(syncVideos, 1000/50);
+function syncVideos2() {
+  var vs = getVideos();
+  var time = currentTime;
+  var i = vs.length;
+  while (i--) {
+    vs[i].currentTime = time;
+  }
 }
+//setInterval(syncVideos2, 500);
 
-function onmove() {
-}
-goog.events.listen(this.viewportSizeMonitor_, goog.events.EventType.RESIZE,                                                                         
-              this.updateSize, false, this);
-*/
 window.resize = resize;
 resize();
+map.on('moveend', function() {
+  console.log('moveend', arguments);
+});

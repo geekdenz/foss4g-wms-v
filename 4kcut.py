@@ -69,4 +69,4 @@ for y in range(yn):
     for x in range(xn):
         for i in range(2):
             for j in range(2):
-                ex(("avconv -i 512_%d_%d.webm -threads 8 -b:v 2M -c:v libvpx -vf crop=%d:%d:%d:%d 256_%d_%d.webm" % (x,y,tilesize,tilesize,tilesize*j,tilesize*i,x*2+j,y*2+i)))
+                ex("avconv -i 00_512_%d_%d.webm -threads 8 -b:v 2M -c:v libvpx -vf crop=%d:%d:%d:%d 01_256_%d_%d.webm" % (x,y,tilesize,tilesize,tilesize*j,tilesize*i,x*2+j,y*2+i))
