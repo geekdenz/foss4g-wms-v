@@ -143,6 +143,21 @@ function timeupdate(event) {
     }
   }
 }
+function sync() {
+  var vs = getVideos();
+  var i = j = k = vs.length;
+  while (i--) {
+    vs[i].pause();
+  }
+  while (j--) {
+    vs[j].currentTime = currentTime;
+  }
+  if (playing) {
+    while (k--) {
+      vs[k].play();
+    }
+  }
+}
 function syncVideos() {
   var vids = getVideos();
   var ii = vids.length;
@@ -152,10 +167,6 @@ function syncVideos() {
     var v = vids[ii];
     v.removeEventListener('timeupdate', timeupdate, true, true);
     v.addEventListener('timeupdate', timeupdate, true, true);
-    if (v.paused && playing) {
-      //v.currentTime = currentTime;
-      //v.play();
-    }
   }
   return;
   if (!len) return;
@@ -217,7 +228,7 @@ function syncVideos() {
   //console.log(currentTime, maxTime);
 }
 
-//setInterval(syncVideos, 1000/50);
+setInterval(syncVideos, 250);
 function syncVideos2() {
   var vs = getVideos();
   var time = currentTime;
@@ -230,6 +241,42 @@ function syncVideos2() {
 
 window.resize = resize;
 resize();
+finishedVideos = {};
+function finished(evt) {
+  if (!evt) return;
+  var v = evt.target;
+  var vs = getVideos();
+  finishedVideos[v.src] = true;
+  var downloaded = true;
+  var i = vs.length;
+  while (i--) {
+    v = vs[i];
+    if (!finishedVideos[v.src]) {
+      downloaded = false;
+      break;
+    }
+  }
+  console.log('finished?');
+  if (downloaded) {
+    console.log('sync');
+    sync();
+  } else {
+    setTimeout(finished, 250);
+  }
+}
+function tryVideos() {
+  console.log('tryVideos', arguments);
+  var vs = getVideos();
+  finishedVideos = {};
+  var i = vs.length;
+  console.log('n', i);
+  while (i--) {
+    var v = vs[i];
+    v.addEventListener('canplaythrough', finished);
+    v.load();
+    finishedVideos[v.src] = false;
+  }
+}
 map.on('moveend', function() {
-  console.log('moveend', arguments);
+  //setTimeout(tryVideos, 1000);
 });

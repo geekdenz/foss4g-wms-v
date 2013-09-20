@@ -1,3 +1,4 @@
+goog.provide('ol.AttributionOptions');
 goog.provide('ol.DeviceOrientationOptions');
 goog.provide('ol.GeolocationOptions');
 goog.provide('ol.GetFeatureInfoOptions');
@@ -29,12 +30,13 @@ goog.provide('ol.interaction.DragRotateOptions');
 goog.provide('ol.interaction.DragZoomOptions');
 goog.provide('ol.interaction.KeyboardPanOptions');
 goog.provide('ol.interaction.KeyboardZoomOptions');
+goog.provide('ol.interaction.SelectOptions');
 goog.provide('ol.interaction.TouchPanOptions');
 goog.provide('ol.interaction.TouchRotateOptions');
-goog.provide('ol.layer.LayerBaseOptions');
-goog.provide('ol.layer.LayerGroupOptions');
+goog.provide('ol.layer.BaseOptions');
+goog.provide('ol.layer.GroupOptions');
 goog.provide('ol.layer.LayerOptions');
-goog.provide('ol.layer.TileLayerOptions');
+goog.provide('ol.layer.TileOptions');
 goog.provide('ol.layer.VectorLayerOptions');
 goog.provide('ol.layer.VideoTileLayerOptions');
 goog.provide('ol.parser.GMLOptions');
@@ -44,29 +46,37 @@ goog.provide('ol.parser.GPXOptions');
 goog.provide('ol.parser.GPXWriteOptions');
 goog.provide('ol.parser.KMLOptions');
 goog.provide('ol.source.BingMapsOptions');
-goog.provide('ol.source.DebugTileSourceOptions');
+goog.provide('ol.source.ImageStaticOptions');
+goog.provide('ol.source.ImageWMSOptions');
 goog.provide('ol.source.OSMOptions');
-goog.provide('ol.source.SingleImageWMSOptions');
 goog.provide('ol.source.SourceOptions');
 goog.provide('ol.source.StamenOptions');
-goog.provide('ol.source.StaticImageOptions');
+goog.provide('ol.source.TileDebugOptions');
 goog.provide('ol.source.TileJSONOptions');
+goog.provide('ol.source.TileWMSOptions');
 goog.provide('ol.source.TiledVideoWMSOptions');
-goog.provide('ol.source.TiledWMSOptions');
+goog.provide('ol.source.Vector2Options');
 goog.provide('ol.source.VectorOptions');
-goog.provide('ol.source.VectorSource2Options');
 goog.provide('ol.source.WMSGetFeatureInfoOptions');
 goog.provide('ol.source.WMTSOptions');
+goog.provide('ol.source.XYZOptions');
+goog.provide('ol.style.FillOptions');
 goog.provide('ol.style.IconOptions');
-goog.provide('ol.style.LineOptions');
-goog.provide('ol.style.PolygonOptions');
 goog.provide('ol.style.RuleOptions');
 goog.provide('ol.style.ShapeOptions');
+goog.provide('ol.style.StrokeOptions');
 goog.provide('ol.style.StyleOptions');
 goog.provide('ol.style.TextOptions');
 goog.provide('ol.tilegrid.TileGridOptions');
 goog.provide('ol.tilegrid.WMTSOptions');
 goog.provide('ol.tilegrid.XYZOptions');
+
+
+/**
+ * @typedef {{html: string,
+ *            tileRanges: (Object.<string, Array.<ol.TileRange>>|undefined)}}
+ */
+ol.AttributionOptions;
 
 
 /**
@@ -76,7 +86,7 @@ ol.DeviceOrientationOptions;
 
 
 /**
- * @typedef {{projection: ol.ProjectionLike,
+ * @typedef {{projection: ol.proj.ProjectionLike,
  *            tracking: (boolean|undefined),
  *            trackingOptions: (GeolocationPositionOptions|undefined)}}
  */
@@ -104,7 +114,8 @@ ol.GetFeaturesOptions;
 /**
  * @typedef {{controls: (ol.Collection|Array.<ol.control.Control>|undefined),
  *            interactions: (ol.Collection|undefined),
- *            layers: (Array.<ol.layer.LayerBase>|ol.Collection|undefined),
+ *            layers: (Array.<ol.layer.Base>|ol.Collection|undefined),
+ *            overlays: (ol.Collection|Array.<ol.Overlay>|undefined),
  *            renderer: (ol.RendererHint|undefined),
  *            renderers: (Array.<ol.RendererHint>|undefined),
  *            target: (Element|string|undefined),
@@ -115,7 +126,6 @@ ol.MapOptions;
 
 /**
  * @typedef {{element: (Element|undefined),
- *            map: (ol.Map|undefined),
  *            position: (ol.Coordinate|undefined),
  *            positioning: (ol.OverlayPositioning|undefined)}}
  */
@@ -135,7 +145,7 @@ ol.Proj4jsProjectionOptions;
  *            code: string,
  *            extent: (ol.Extent|undefined),
  *            global: (boolean|undefined),
- *            units: ol.ProjectionUnits}}
+ *            units: ol.proj.Units}}
  */
 ol.ProjectionOptions;
 
@@ -144,7 +154,7 @@ ol.ProjectionOptions;
  * @typedef {{center: (ol.Coordinate|undefined),
  *            maxResolution: (number|undefined),
  *            maxZoom: (number|undefined),
- *            projection: ol.ProjectionLike,
+ *            projection: ol.proj.ProjectionLike,
  *            resolution: (number|undefined),
  *            resolutions: (Array.<number>|undefined),
  *            rotation: (number|undefined),
@@ -192,7 +202,6 @@ ol.animation.ZoomOptions;
 
 /**
  * @typedef {{className: (string|undefined),
- *            map: (ol.Map|undefined),
  *            target: (Element|undefined)}}
  */
 ol.control.AttributionOptions;
@@ -200,7 +209,6 @@ ol.control.AttributionOptions;
 
 /**
  * @typedef {{element: (Element|undefined),
- *            map: (ol.Map|undefined),
  *            target: (Element|undefined)}}
  */
 ol.control.ControlOptions;
@@ -220,7 +228,6 @@ ol.control.DefaultsOptions;
 /**
  * @typedef {{className: (string|undefined),
  *            keys: (boolean|undefined),
- *            map: (ol.Map|undefined),
  *            target: (Element|undefined)}}
  */
 ol.control.FullScreenOptions;
@@ -228,7 +235,6 @@ ol.control.FullScreenOptions;
 
 /**
  * @typedef {{className: (string|undefined),
- *            map: (ol.Map|undefined),
  *            target: (Element|undefined)}}
  */
 ol.control.LogoOptions;
@@ -237,8 +243,7 @@ ol.control.LogoOptions;
 /**
  * @typedef {{className: (string|undefined),
  *            coordinateFormat: (ol.CoordinateFormatType|undefined),
- *            map: (ol.Map|undefined),
- *            projection: ol.ProjectionLike,
+ *            projection: ol.proj.ProjectionLike,
  *            target: (Element|undefined),
  *            undefinedHTML: (string|undefined)}}
  */
@@ -247,7 +252,6 @@ ol.control.MousePositionOptions;
 
 /**
  * @typedef {{className: (string|undefined),
- *            map: (ol.Map|undefined),
  *            minWidth: (number|undefined),
  *            target: (Element|undefined),
  *            units: (ol.control.ScaleLineUnits|undefined)}}
@@ -258,7 +262,6 @@ ol.control.ScaleLineOptions;
 /**
  * @typedef {{className: (string|undefined),
  *            delta: (number|undefined),
- *            map: (ol.Map|undefined),
  *            target: (Element|undefined)}}
  */
 ol.control.ZoomOptions;
@@ -266,7 +269,6 @@ ol.control.ZoomOptions;
 
 /**
  * @typedef {{className: (string|undefined),
- *            map: (ol.Map|undefined),
  *            maxResolution: (number|undefined),
  *            minResolution: (number|undefined)}}
  */
@@ -276,7 +278,6 @@ ol.control.ZoomSliderOptions;
 /**
  * @typedef {{className: (string|undefined),
  *            extent: (ol.Extent|undefined),
- *            map: (ol.Map|undefined),
  *            target: (Element|undefined)}}
  */
 ol.control.ZoomToExtentOptions;
@@ -343,6 +344,13 @@ ol.interaction.KeyboardZoomOptions;
 
 
 /**
+ * @typedef {{condition: (ol.interaction.ConditionType|undefined),
+ *            layerFilter: (undefined|function(ol.layer.Layer):boolean)}}
+ */
+ol.interaction.SelectOptions;
+
+
+/**
  * @typedef {{kinetic: (ol.Kinetic|undefined)}}
  */
 ol.interaction.TouchPanOptions;
@@ -362,19 +370,19 @@ ol.interaction.TouchRotateOptions;
  *            saturation: (number|undefined),
  *            visible: (boolean|undefined)}}
  */
-ol.layer.LayerBaseOptions;
+ol.layer.BaseOptions;
 
 
 /**
  * @typedef {{brightness: (number|undefined),
  *            contrast: (number|undefined),
  *            hue: (number|undefined),
- *            layers: (Array.<ol.layer.LayerBase>|ol.Collection|undefined),
+ *            layers: (Array.<ol.layer.Base>|ol.Collection|undefined),
  *            opacity: (number|undefined),
  *            saturation: (number|undefined),
  *            visible: (boolean|undefined)}}
  */
-ol.layer.LayerGroupOptions;
+ol.layer.GroupOptions;
 
 
 /**
@@ -399,7 +407,7 @@ ol.layer.LayerOptions;
  *            source: ol.source.Source,
  *            visible: (boolean|undefined)}}
  */
-ol.layer.TileLayerOptions;
+ol.layer.TileOptions;
 
 
 /**
@@ -449,7 +457,7 @@ ol.parser.GMLReadOptions;
 
 /**
  * @typedef {{axisOrientation: (string|undefined),
- *            srsName: ol.ProjectionLike}}
+ *            srsName: ol.proj.ProjectionLike}}
  */
 ol.parser.GMLWriteOptions;
 
@@ -491,11 +499,28 @@ ol.source.BingMapsOptions;
 
 
 /**
- * @typedef {{extent: (ol.Extent|undefined),
- *            projection: ol.ProjectionLike,
- *            tileGrid: (ol.tilegrid.TileGrid|undefined)}}
+ * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
+ *            crossOrigin: (null|string|undefined),
+ *            extent: (ol.Extent|undefined),
+ *            imageExtent: (ol.Extent|undefined),
+ *            imageSize: (ol.Size|undefined),
+ *            projection: ol.proj.ProjectionLike,
+ *            url: (string|undefined)}}
  */
-ol.source.DebugTileSourceOptions;
+ol.source.ImageStaticOptions;
+
+
+/**
+ * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
+ *            crossOrigin: (null|string|undefined),
+ *            extent: (ol.Extent|undefined),
+ *            params: Object.<string,*>,
+ *            projection: ol.proj.ProjectionLike,
+ *            ratio: (number|undefined),
+ *            resolutions: (Array.<number>|undefined),
+ *            url: (string|undefined)}}
+ */
+ol.source.ImageWMSOptions;
 
 
 /**
@@ -509,22 +534,9 @@ ol.source.OSMOptions;
 
 /**
  * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
- *            crossOrigin: (null|string|undefined),
- *            extent: (ol.Extent|undefined),
- *            params: Object.<string,*>,
- *            projection: ol.ProjectionLike,
- *            ratio: (number|undefined),
- *            resolutions: (Array.<number>|undefined),
- *            url: (string|undefined)}}
- */
-ol.source.SingleImageWMSOptions;
-
-
-/**
- * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
  *            extent: (ol.Extent|undefined),
  *            logo: (string|undefined),
- *            projection: ol.ProjectionLike}}
+ *            projection: ol.proj.ProjectionLike}}
  */
 ol.source.SourceOptions;
 
@@ -540,15 +552,11 @@ ol.source.StamenOptions;
 
 
 /**
- * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
- *            crossOrigin: (null|string|undefined),
- *            extent: (ol.Extent|undefined),
- *            imageExtent: (ol.Extent|undefined),
- *            imageSize: (ol.Size|undefined),
- *            projection: ol.ProjectionLike,
- *            url: (string|undefined)}}
+ * @typedef {{extent: (ol.Extent|undefined),
+ *            projection: ol.proj.ProjectionLike,
+ *            tileGrid: (ol.tilegrid.TileGrid|undefined)}}
  */
-ol.source.StaticImageOptions;
+ol.source.TileDebugOptions;
 
 
 /**
@@ -564,7 +572,21 @@ ol.source.TileJSONOptions;
  *            extent: (ol.Extent|undefined),
  *            maxZoom: (number|undefined),
  *            params: Object.<string,*>,
- *            projection: ol.ProjectionLike,
+ *            projection: ol.proj.ProjectionLike,
+ *            tileGrid: (ol.tilegrid.TileGrid|undefined),
+ *            url: (string|undefined),
+ *            urls: (Array.<string>|undefined)}}
+ */
+ol.source.TileWMSOptions;
+
+
+/**
+ * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
+ *            crossOrigin: (null|string|undefined),
+ *            extent: (ol.Extent|undefined),
+ *            maxZoom: (number|undefined),
+ *            params: Object.<string,*>,
+ *            projection: ol.proj.ProjectionLike,
  *            tileGrid: (ol.tilegrid.TileGrid|undefined),
  *            url: (string|undefined),
  *            urls: (Array.<string>|undefined)}}
@@ -574,16 +596,11 @@ ol.source.TiledVideoWMSOptions;
 
 /**
  * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
- *            crossOrigin: (null|string|undefined),
  *            extent: (ol.Extent|undefined),
- *            maxZoom: (number|undefined),
- *            params: Object.<string,*>,
- *            projection: ol.ProjectionLike,
- *            tileGrid: (ol.tilegrid.TileGrid|undefined),
- *            url: (string|undefined),
- *            urls: (Array.<string>|undefined)}}
+ *            pointCollections: (Array.<ol.geom2.PointCollection>|undefined),
+ *            projection: ol.proj.ProjectionLike}}
  */
-ol.source.TiledWMSOptions;
+ol.source.Vector2Options;
 
 
 /**
@@ -592,19 +609,10 @@ ol.source.TiledWMSOptions;
  *            extent: (ol.Extent|undefined),
  *            logo: (string|undefined),
  *            parser: ol.parser.Parser,
- *            projection: (ol.ProjectionLike|undefined),
+ *            projection: (ol.proj.ProjectionLike|undefined),
  *            url: (string|undefined)}}
  */
 ol.source.VectorOptions;
-
-
-/**
- * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
- *            extent: (ol.Extent|undefined),
- *            pointCollections: (Array.<ol.geom2.PointCollection>|undefined),
- *            projection: ol.ProjectionLike}}
- */
-ol.source.VectorSource2Options;
 
 
 /**
@@ -623,14 +631,37 @@ ol.source.WMSGetFeatureInfoOptions;
  *            layer: string,
  *            matrixSet: string,
  *            maxZoom: (number|undefined),
- *            projection: ol.ProjectionLike,
+ *            projection: ol.proj.ProjectionLike,
  *            requestEncoding: (ol.source.WMTSRequestEncoding|undefined),
  *            style: string,
  *            tileGrid: ol.tilegrid.WMTS,
  *            url: (string|undefined),
- *            urls: (Array.<string>|undefined)}}
+ *            urls: (Array.<string>|undefined),
+ *            version: (string|undefined)}}
  */
 ol.source.WMTSOptions;
+
+
+/**
+ * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
+ *            crossOrigin: (null|string|undefined),
+ *            extent: (ol.Extent|undefined),
+ *            logo: (string|undefined),
+ *            maxZoom: (number|undefined),
+ *            minZoom: (number|undefined),
+ *            projection: ol.proj.ProjectionLike,
+ *            tileUrlFunction: (ol.TileUrlFunctionType|undefined),
+ *            url: (string|undefined),
+ *            urls: (Array.<string>|undefined)}}
+ */
+ol.source.XYZOptions;
+
+
+/**
+ * @typedef {{color: (string|ol.expr.Expression|undefined),
+ *            opacity: (number|ol.expr.Expression|undefined)}}
+ */
+ol.style.FillOptions;
 
 
 /**
@@ -638,26 +669,11 @@ ol.source.WMTSOptions;
  *            opacity: (number|ol.expr.Expression|undefined),
  *            rotation: (number|ol.expr.Expression|undefined),
  *            url: (string|ol.expr.Expression),
- *            width: (number|ol.expr.Expression|undefined)}}
+ *            width: (number|ol.expr.Expression|undefined),
+ *            xOffset: (number|ol.expr.Expression|undefined),
+ *            yOffset: (number|ol.expr.Expression|undefined)}}
  */
 ol.style.IconOptions;
-
-
-/**
- * @typedef {{strokeColor: (string|ol.expr.Expression|undefined),
- *            strokeOpacity: (number|ol.expr.Expression|undefined),
- *            strokeWidth: (number|ol.expr.Expression|undefined)}}
- */
-ol.style.LineOptions;
-
-
-/**
- * @typedef {{fillColor: (string|ol.expr.Expression|undefined),
- *            opacity: (number|ol.expr.Expression|undefined),
- *            strokeColor: (string|ol.expr.Expression|undefined),
- *            strokeWidth: (number|ol.expr.Expression|undefined)}}
- */
-ol.style.PolygonOptions;
 
 
 /**
@@ -668,19 +684,25 @@ ol.style.RuleOptions;
 
 
 /**
- * @typedef {{fillColor: (string|ol.expr.Expression|undefined),
- *            fillOpacity: (number|ol.expr.Expression|undefined),
+ * @typedef {{fill: (ol.style.Fill|undefined),
  *            size: (number|ol.expr.Expression|undefined),
- *            strokeColor: (string|ol.expr.Expression|undefined),
- *            strokeOpacity: (number|ol.expr.Expression|undefined),
- *            strokeWidth: (number|ol.expr.Expression|undefined),
+ *            stroke: (ol.style.Stroke|undefined),
  *            type: (ol.style.ShapeType|undefined)}}
  */
 ol.style.ShapeOptions;
 
 
 /**
- * @typedef {{rules: Array.<ol.style.Rule>}}
+ * @typedef {{color: (string|ol.expr.Expression|undefined),
+ *            opacity: (number|ol.expr.Expression|undefined),
+ *            width: (number|ol.expr.Expression|undefined)}}
+ */
+ol.style.StrokeOptions;
+
+
+/**
+ * @typedef {{rules: (Array.<ol.style.Rule>|undefined),
+ *            symbolizers: (Array.<ol.style.Symbolizer>|undefined)}}
  */
 ol.style.StyleOptions;
 

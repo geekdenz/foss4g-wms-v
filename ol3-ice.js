@@ -67,7 +67,7 @@ var view = new ol.View2D({
     maxZoom: 2
   });
 var extent = [1000000, 4700000.0000001, 2200000, 6300000];
-var source = new ol.source.ImageTileSource({
+var source = new ol.source.TileImage({
       tileGrid: new ol.tilegrid.XYZ({
         //origin: [1000000, 4700000.0000001],
         //origin: [-ol.proj.EPSG3857.HALF_SIZE, ol.proj.EPSG3857.HALF_SIZE],

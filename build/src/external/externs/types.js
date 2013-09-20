@@ -61,6 +61,25 @@ olx.tilegrid = {};
 /**
  * @interface
  */
+olx.AttributionOptionsExtern = function() {};
+
+
+/**
+ * @type {string}
+ */
+olx.AttributionOptionsExtern.prototype.html;
+
+
+/**
+ * @type {Object.<string, Array.<ol.TileRange>>|undefined}
+ */
+olx.AttributionOptionsExtern.prototype.tileRanges;
+
+
+
+/**
+ * @interface
+ */
 olx.DeviceOrientationOptionsExtern = function() {};
 
 
@@ -78,7 +97,7 @@ olx.GeolocationOptionsExtern = function() {};
 
 
 /**
- * @type {ol.ProjectionLike}
+ * @type {ol.proj.ProjectionLike}
  */
 olx.GeolocationOptionsExtern.prototype.projection;
 
@@ -177,9 +196,15 @@ olx.MapOptionsExtern.prototype.interactions;
 
 
 /**
- * @type {Array.<ol.layer.LayerBase>|ol.Collection|undefined}
+ * @type {Array.<ol.layer.Base>|ol.Collection|undefined}
  */
 olx.MapOptionsExtern.prototype.layers;
+
+
+/**
+ * @type {ol.Collection|Array.<ol.Overlay>|undefined}
+ */
+olx.MapOptionsExtern.prototype.overlays;
 
 
 /**
@@ -217,12 +242,6 @@ olx.OverlayOptionsExtern = function() {};
  * @type {Element|undefined}
  */
 olx.OverlayOptionsExtern.prototype.element;
-
-
-/**
- * @type {ol.Map|undefined}
- */
-olx.OverlayOptionsExtern.prototype.map;
 
 
 /**
@@ -294,7 +313,7 @@ olx.ProjectionOptionsExtern.prototype.global;
 
 
 /**
- * @type {ol.ProjectionUnits}
+ * @type {ol.proj.Units}
  */
 olx.ProjectionOptionsExtern.prototype.units;
 
@@ -325,7 +344,7 @@ olx.View2DOptionsExtern.prototype.maxZoom;
 
 
 /**
- * @type {ol.ProjectionLike}
+ * @type {ol.proj.ProjectionLike}
  */
 olx.View2DOptionsExtern.prototype.projection;
 
@@ -498,12 +517,6 @@ olx.control.AttributionOptionsExtern.prototype.className;
 
 
 /**
- * @type {ol.Map|undefined}
- */
-olx.control.AttributionOptionsExtern.prototype.map;
-
-
-/**
  * @type {Element|undefined}
  */
 olx.control.AttributionOptionsExtern.prototype.target;
@@ -520,12 +533,6 @@ olx.control.ControlOptionsExtern = function() {};
  * @type {Element|undefined}
  */
 olx.control.ControlOptionsExtern.prototype.element;
-
-
-/**
- * @type {ol.Map|undefined}
- */
-olx.control.ControlOptionsExtern.prototype.map;
 
 
 /**
@@ -548,7 +555,7 @@ olx.control.DefaultsOptionsExtern.prototype.attribution;
 
 
 /**
- * @type {ol.control.AttributionOptions|undefined}
+ * @type {olx.control.AttributionOptionsExtern|undefined}
  */
 olx.control.DefaultsOptionsExtern.prototype.attributionOptions;
 
@@ -560,7 +567,7 @@ olx.control.DefaultsOptionsExtern.prototype.logo;
 
 
 /**
- * @type {ol.control.LogoOptions|undefined}
+ * @type {olx.control.LogoOptionsExtern|undefined}
  */
 olx.control.DefaultsOptionsExtern.prototype.logoOptions;
 
@@ -572,7 +579,7 @@ olx.control.DefaultsOptionsExtern.prototype.zoom;
 
 
 /**
- * @type {ol.control.ZoomOptions|undefined}
+ * @type {olx.control.ZoomOptionsExtern|undefined}
  */
 olx.control.DefaultsOptionsExtern.prototype.zoomOptions;
 
@@ -597,12 +604,6 @@ olx.control.FullScreenOptionsExtern.prototype.keys;
 
 
 /**
- * @type {ol.Map|undefined}
- */
-olx.control.FullScreenOptionsExtern.prototype.map;
-
-
-/**
  * @type {Element|undefined}
  */
 olx.control.FullScreenOptionsExtern.prototype.target;
@@ -619,12 +620,6 @@ olx.control.LogoOptionsExtern = function() {};
  * @type {string|undefined}
  */
 olx.control.LogoOptionsExtern.prototype.className;
-
-
-/**
- * @type {ol.Map|undefined}
- */
-olx.control.LogoOptionsExtern.prototype.map;
 
 
 /**
@@ -653,13 +648,7 @@ olx.control.MousePositionOptionsExtern.prototype.coordinateFormat;
 
 
 /**
- * @type {ol.Map|undefined}
- */
-olx.control.MousePositionOptionsExtern.prototype.map;
-
-
-/**
- * @type {ol.ProjectionLike}
+ * @type {ol.proj.ProjectionLike}
  */
 olx.control.MousePositionOptionsExtern.prototype.projection;
 
@@ -687,12 +676,6 @@ olx.control.ScaleLineOptionsExtern = function() {};
  * @type {string|undefined}
  */
 olx.control.ScaleLineOptionsExtern.prototype.className;
-
-
-/**
- * @type {ol.Map|undefined}
- */
-olx.control.ScaleLineOptionsExtern.prototype.map;
 
 
 /**
@@ -733,12 +716,6 @@ olx.control.ZoomOptionsExtern.prototype.delta;
 
 
 /**
- * @type {ol.Map|undefined}
- */
-olx.control.ZoomOptionsExtern.prototype.map;
-
-
-/**
  * @type {Element|undefined}
  */
 olx.control.ZoomOptionsExtern.prototype.target;
@@ -755,12 +732,6 @@ olx.control.ZoomSliderOptionsExtern = function() {};
  * @type {string|undefined}
  */
 olx.control.ZoomSliderOptionsExtern.prototype.className;
-
-
-/**
- * @type {ol.Map|undefined}
- */
-olx.control.ZoomSliderOptionsExtern.prototype.map;
 
 
 /**
@@ -792,12 +763,6 @@ olx.control.ZoomToExtentOptionsExtern.prototype.className;
  * @type {ol.Extent|undefined}
  */
 olx.control.ZoomToExtentOptionsExtern.prototype.extent;
-
-
-/**
- * @type {ol.Map|undefined}
- */
-olx.control.ZoomToExtentOptionsExtern.prototype.map;
 
 
 /**
@@ -986,6 +951,25 @@ olx.interaction.KeyboardZoomOptionsExtern.prototype.delta;
 /**
  * @interface
  */
+olx.interaction.SelectOptionsExtern = function() {};
+
+
+/**
+ * @type {ol.interaction.ConditionType|undefined}
+ */
+olx.interaction.SelectOptionsExtern.prototype.condition;
+
+
+/**
+ * @type {undefined|function(ol.layer.Layer):boolean}
+ */
+olx.interaction.SelectOptionsExtern.prototype.layerFilter;
+
+
+
+/**
+ * @interface
+ */
 olx.interaction.TouchPanOptionsExtern = function() {};
 
 
@@ -1012,92 +996,92 @@ olx.interaction.TouchRotateOptionsExtern.prototype.threshold;
 /**
  * @interface
  */
-olx.layer.LayerBaseOptionsExtern = function() {};
+olx.layer.BaseOptionsExtern = function() {};
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.LayerBaseOptionsExtern.prototype.brightness;
+olx.layer.BaseOptionsExtern.prototype.brightness;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.LayerBaseOptionsExtern.prototype.contrast;
+olx.layer.BaseOptionsExtern.prototype.contrast;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.LayerBaseOptionsExtern.prototype.hue;
+olx.layer.BaseOptionsExtern.prototype.hue;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.LayerBaseOptionsExtern.prototype.opacity;
+olx.layer.BaseOptionsExtern.prototype.opacity;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.LayerBaseOptionsExtern.prototype.saturation;
+olx.layer.BaseOptionsExtern.prototype.saturation;
 
 
 /**
  * @type {boolean|undefined}
  */
-olx.layer.LayerBaseOptionsExtern.prototype.visible;
+olx.layer.BaseOptionsExtern.prototype.visible;
 
 
 
 /**
  * @interface
  */
-olx.layer.LayerGroupOptionsExtern = function() {};
+olx.layer.GroupOptionsExtern = function() {};
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.LayerGroupOptionsExtern.prototype.brightness;
+olx.layer.GroupOptionsExtern.prototype.brightness;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.LayerGroupOptionsExtern.prototype.contrast;
+olx.layer.GroupOptionsExtern.prototype.contrast;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.LayerGroupOptionsExtern.prototype.hue;
+olx.layer.GroupOptionsExtern.prototype.hue;
 
 
 /**
- * @type {Array.<ol.layer.LayerBase>|ol.Collection|undefined}
+ * @type {Array.<ol.layer.Base>|ol.Collection|undefined}
  */
-olx.layer.LayerGroupOptionsExtern.prototype.layers;
-
-
-/**
- * @type {number|undefined}
- */
-olx.layer.LayerGroupOptionsExtern.prototype.opacity;
+olx.layer.GroupOptionsExtern.prototype.layers;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.LayerGroupOptionsExtern.prototype.saturation;
+olx.layer.GroupOptionsExtern.prototype.opacity;
+
+
+/**
+ * @type {number|undefined}
+ */
+olx.layer.GroupOptionsExtern.prototype.saturation;
 
 
 /**
  * @type {boolean|undefined}
  */
-olx.layer.LayerGroupOptionsExtern.prototype.visible;
+olx.layer.GroupOptionsExtern.prototype.visible;
 
 
 
@@ -1153,55 +1137,55 @@ olx.layer.LayerOptionsExtern.prototype.visible;
 /**
  * @interface
  */
-olx.layer.TileLayerOptionsExtern = function() {};
+olx.layer.TileOptionsExtern = function() {};
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.TileLayerOptionsExtern.prototype.brightness;
+olx.layer.TileOptionsExtern.prototype.brightness;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.TileLayerOptionsExtern.prototype.contrast;
+olx.layer.TileOptionsExtern.prototype.contrast;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.TileLayerOptionsExtern.prototype.hue;
+olx.layer.TileOptionsExtern.prototype.hue;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.TileLayerOptionsExtern.prototype.opacity;
+olx.layer.TileOptionsExtern.prototype.opacity;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.TileLayerOptionsExtern.prototype.preload;
+olx.layer.TileOptionsExtern.prototype.preload;
 
 
 /**
  * @type {number|undefined}
  */
-olx.layer.TileLayerOptionsExtern.prototype.saturation;
+olx.layer.TileOptionsExtern.prototype.saturation;
 
 
 /**
  * @type {ol.source.Source}
  */
-olx.layer.TileLayerOptionsExtern.prototype.source;
+olx.layer.TileOptionsExtern.prototype.source;
 
 
 /**
  * @type {boolean|undefined}
  */
-olx.layer.TileLayerOptionsExtern.prototype.visible;
+olx.layer.TileOptionsExtern.prototype.visible;
 
 
 
@@ -1346,7 +1330,7 @@ olx.parser.GMLOptionsExtern.prototype.multiSurface;
 
 
 /**
- * @type {ol.parser.GMLReadOptions|undefined}
+ * @type {olx.parser.GMLReadOptionsExtern|undefined}
  */
 olx.parser.GMLOptionsExtern.prototype.readOptions;
 
@@ -1364,7 +1348,7 @@ olx.parser.GMLOptionsExtern.prototype.surface;
 
 
 /**
- * @type {ol.parser.GMLWriteOptions|undefined}
+ * @type {olx.parser.GMLWriteOptionsExtern|undefined}
  */
 olx.parser.GMLOptionsExtern.prototype.writeOptions;
 
@@ -1396,7 +1380,7 @@ olx.parser.GMLWriteOptionsExtern.prototype.axisOrientation;
 
 
 /**
- * @type {ol.ProjectionLike}
+ * @type {ol.proj.ProjectionLike}
  */
 olx.parser.GMLWriteOptionsExtern.prototype.srsName;
 
@@ -1529,25 +1513,104 @@ olx.source.BingMapsOptionsExtern.prototype.style;
 /**
  * @interface
  */
-olx.source.DebugTileSourceOptionsExtern = function() {};
+olx.source.ImageStaticOptionsExtern = function() {};
+
+
+/**
+ * @type {Array.<ol.Attribution>|undefined}
+ */
+olx.source.ImageStaticOptionsExtern.prototype.attributions;
+
+
+/**
+ * @type {null|string|undefined}
+ */
+olx.source.ImageStaticOptionsExtern.prototype.crossOrigin;
 
 
 /**
  * @type {ol.Extent|undefined}
  */
-olx.source.DebugTileSourceOptionsExtern.prototype.extent;
+olx.source.ImageStaticOptionsExtern.prototype.extent;
 
 
 /**
- * @type {ol.ProjectionLike}
+ * @type {ol.Extent|undefined}
  */
-olx.source.DebugTileSourceOptionsExtern.prototype.projection;
+olx.source.ImageStaticOptionsExtern.prototype.imageExtent;
 
 
 /**
- * @type {ol.tilegrid.TileGrid|undefined}
+ * @type {ol.Size|undefined}
  */
-olx.source.DebugTileSourceOptionsExtern.prototype.tileGrid;
+olx.source.ImageStaticOptionsExtern.prototype.imageSize;
+
+
+/**
+ * @type {ol.proj.ProjectionLike}
+ */
+olx.source.ImageStaticOptionsExtern.prototype.projection;
+
+
+/**
+ * @type {string|undefined}
+ */
+olx.source.ImageStaticOptionsExtern.prototype.url;
+
+
+
+/**
+ * @interface
+ */
+olx.source.ImageWMSOptionsExtern = function() {};
+
+
+/**
+ * @type {Array.<ol.Attribution>|undefined}
+ */
+olx.source.ImageWMSOptionsExtern.prototype.attributions;
+
+
+/**
+ * @type {null|string|undefined}
+ */
+olx.source.ImageWMSOptionsExtern.prototype.crossOrigin;
+
+
+/**
+ * @type {ol.Extent|undefined}
+ */
+olx.source.ImageWMSOptionsExtern.prototype.extent;
+
+
+/**
+ * @type {Object.<string,*>}
+ */
+olx.source.ImageWMSOptionsExtern.prototype.params;
+
+
+/**
+ * @type {ol.proj.ProjectionLike}
+ */
+olx.source.ImageWMSOptionsExtern.prototype.projection;
+
+
+/**
+ * @type {number|undefined}
+ */
+olx.source.ImageWMSOptionsExtern.prototype.ratio;
+
+
+/**
+ * @type {Array.<number>|undefined}
+ */
+olx.source.ImageWMSOptionsExtern.prototype.resolutions;
+
+
+/**
+ * @type {string|undefined}
+ */
+olx.source.ImageWMSOptionsExtern.prototype.url;
 
 
 
@@ -1585,61 +1648,6 @@ olx.source.OSMOptionsExtern.prototype.url;
 /**
  * @interface
  */
-olx.source.SingleImageWMSOptionsExtern = function() {};
-
-
-/**
- * @type {Array.<ol.Attribution>|undefined}
- */
-olx.source.SingleImageWMSOptionsExtern.prototype.attributions;
-
-
-/**
- * @type {null|string|undefined}
- */
-olx.source.SingleImageWMSOptionsExtern.prototype.crossOrigin;
-
-
-/**
- * @type {ol.Extent|undefined}
- */
-olx.source.SingleImageWMSOptionsExtern.prototype.extent;
-
-
-/**
- * @type {Object.<string,*>}
- */
-olx.source.SingleImageWMSOptionsExtern.prototype.params;
-
-
-/**
- * @type {ol.ProjectionLike}
- */
-olx.source.SingleImageWMSOptionsExtern.prototype.projection;
-
-
-/**
- * @type {number|undefined}
- */
-olx.source.SingleImageWMSOptionsExtern.prototype.ratio;
-
-
-/**
- * @type {Array.<number>|undefined}
- */
-olx.source.SingleImageWMSOptionsExtern.prototype.resolutions;
-
-
-/**
- * @type {string|undefined}
- */
-olx.source.SingleImageWMSOptionsExtern.prototype.url;
-
-
-
-/**
- * @interface
- */
 olx.source.SourceOptionsExtern = function() {};
 
 
@@ -1662,7 +1670,7 @@ olx.source.SourceOptionsExtern.prototype.logo;
 
 
 /**
- * @type {ol.ProjectionLike}
+ * @type {ol.proj.ProjectionLike}
  */
 olx.source.SourceOptionsExtern.prototype.projection;
 
@@ -1708,49 +1716,25 @@ olx.source.StamenOptionsExtern.prototype.url;
 /**
  * @interface
  */
-olx.source.StaticImageOptionsExtern = function() {};
-
-
-/**
- * @type {Array.<ol.Attribution>|undefined}
- */
-olx.source.StaticImageOptionsExtern.prototype.attributions;
-
-
-/**
- * @type {null|string|undefined}
- */
-olx.source.StaticImageOptionsExtern.prototype.crossOrigin;
+olx.source.TileDebugOptionsExtern = function() {};
 
 
 /**
  * @type {ol.Extent|undefined}
  */
-olx.source.StaticImageOptionsExtern.prototype.extent;
+olx.source.TileDebugOptionsExtern.prototype.extent;
 
 
 /**
- * @type {ol.Extent|undefined}
+ * @type {ol.proj.ProjectionLike}
  */
-olx.source.StaticImageOptionsExtern.prototype.imageExtent;
+olx.source.TileDebugOptionsExtern.prototype.projection;
 
 
 /**
- * @type {ol.Size|undefined}
+ * @type {ol.tilegrid.TileGrid|undefined}
  */
-olx.source.StaticImageOptionsExtern.prototype.imageSize;
-
-
-/**
- * @type {ol.ProjectionLike}
- */
-olx.source.StaticImageOptionsExtern.prototype.projection;
-
-
-/**
- * @type {string|undefined}
- */
-olx.source.StaticImageOptionsExtern.prototype.url;
+olx.source.TileDebugOptionsExtern.prototype.tileGrid;
 
 
 
@@ -1770,6 +1754,67 @@ olx.source.TileJSONOptionsExtern.prototype.crossOrigin;
  * @type {string}
  */
 olx.source.TileJSONOptionsExtern.prototype.url;
+
+
+
+/**
+ * @interface
+ */
+olx.source.TileWMSOptionsExtern = function() {};
+
+
+/**
+ * @type {Array.<ol.Attribution>|undefined}
+ */
+olx.source.TileWMSOptionsExtern.prototype.attributions;
+
+
+/**
+ * @type {null|string|undefined}
+ */
+olx.source.TileWMSOptionsExtern.prototype.crossOrigin;
+
+
+/**
+ * @type {ol.Extent|undefined}
+ */
+olx.source.TileWMSOptionsExtern.prototype.extent;
+
+
+/**
+ * @type {number|undefined}
+ */
+olx.source.TileWMSOptionsExtern.prototype.maxZoom;
+
+
+/**
+ * @type {Object.<string,*>}
+ */
+olx.source.TileWMSOptionsExtern.prototype.params;
+
+
+/**
+ * @type {ol.proj.ProjectionLike}
+ */
+olx.source.TileWMSOptionsExtern.prototype.projection;
+
+
+/**
+ * @type {ol.tilegrid.TileGrid|undefined}
+ */
+olx.source.TileWMSOptionsExtern.prototype.tileGrid;
+
+
+/**
+ * @type {string|undefined}
+ */
+olx.source.TileWMSOptionsExtern.prototype.url;
+
+
+/**
+ * @type {Array.<string>|undefined}
+ */
+olx.source.TileWMSOptionsExtern.prototype.urls;
 
 
 
@@ -1810,7 +1855,7 @@ olx.source.TiledVideoWMSOptionsExtern.prototype.params;
 
 
 /**
- * @type {ol.ProjectionLike}
+ * @type {ol.proj.ProjectionLike}
  */
 olx.source.TiledVideoWMSOptionsExtern.prototype.projection;
 
@@ -1837,61 +1882,31 @@ olx.source.TiledVideoWMSOptionsExtern.prototype.urls;
 /**
  * @interface
  */
-olx.source.TiledWMSOptionsExtern = function() {};
+olx.source.Vector2OptionsExtern = function() {};
 
 
 /**
  * @type {Array.<ol.Attribution>|undefined}
  */
-olx.source.TiledWMSOptionsExtern.prototype.attributions;
-
-
-/**
- * @type {null|string|undefined}
- */
-olx.source.TiledWMSOptionsExtern.prototype.crossOrigin;
+olx.source.Vector2OptionsExtern.prototype.attributions;
 
 
 /**
  * @type {ol.Extent|undefined}
  */
-olx.source.TiledWMSOptionsExtern.prototype.extent;
+olx.source.Vector2OptionsExtern.prototype.extent;
 
 
 /**
- * @type {number|undefined}
+ * @type {Array.<ol.geom2.PointCollection>|undefined}
  */
-olx.source.TiledWMSOptionsExtern.prototype.maxZoom;
+olx.source.Vector2OptionsExtern.prototype.pointCollections;
 
 
 /**
- * @type {Object.<string,*>}
+ * @type {ol.proj.ProjectionLike}
  */
-olx.source.TiledWMSOptionsExtern.prototype.params;
-
-
-/**
- * @type {ol.ProjectionLike}
- */
-olx.source.TiledWMSOptionsExtern.prototype.projection;
-
-
-/**
- * @type {ol.tilegrid.TileGrid|undefined}
- */
-olx.source.TiledWMSOptionsExtern.prototype.tileGrid;
-
-
-/**
- * @type {string|undefined}
- */
-olx.source.TiledWMSOptionsExtern.prototype.url;
-
-
-/**
- * @type {Array.<string>|undefined}
- */
-olx.source.TiledWMSOptionsExtern.prototype.urls;
+olx.source.Vector2OptionsExtern.prototype.projection;
 
 
 
@@ -1932,7 +1947,7 @@ olx.source.VectorOptionsExtern.prototype.parser;
 
 
 /**
- * @type {ol.ProjectionLike|undefined}
+ * @type {ol.proj.ProjectionLike|undefined}
  */
 olx.source.VectorOptionsExtern.prototype.projection;
 
@@ -1941,37 +1956,6 @@ olx.source.VectorOptionsExtern.prototype.projection;
  * @type {string|undefined}
  */
 olx.source.VectorOptionsExtern.prototype.url;
-
-
-
-/**
- * @interface
- */
-olx.source.VectorSource2OptionsExtern = function() {};
-
-
-/**
- * @type {Array.<ol.Attribution>|undefined}
- */
-olx.source.VectorSource2OptionsExtern.prototype.attributions;
-
-
-/**
- * @type {ol.Extent|undefined}
- */
-olx.source.VectorSource2OptionsExtern.prototype.extent;
-
-
-/**
- * @type {Array.<ol.geom2.PointCollection>|undefined}
- */
-olx.source.VectorSource2OptionsExtern.prototype.pointCollections;
-
-
-/**
- * @type {ol.ProjectionLike}
- */
-olx.source.VectorSource2OptionsExtern.prototype.projection;
 
 
 
@@ -2049,7 +2033,7 @@ olx.source.WMTSOptionsExtern.prototype.maxZoom;
 
 
 /**
- * @type {ol.ProjectionLike}
+ * @type {ol.proj.ProjectionLike}
  */
 olx.source.WMTSOptionsExtern.prototype.projection;
 
@@ -2082,6 +2066,98 @@ olx.source.WMTSOptionsExtern.prototype.url;
  * @type {Array.<string>|undefined}
  */
 olx.source.WMTSOptionsExtern.prototype.urls;
+
+
+/**
+ * @type {string|undefined}
+ */
+olx.source.WMTSOptionsExtern.prototype.version;
+
+
+
+/**
+ * @interface
+ */
+olx.source.XYZOptionsExtern = function() {};
+
+
+/**
+ * @type {Array.<ol.Attribution>|undefined}
+ */
+olx.source.XYZOptionsExtern.prototype.attributions;
+
+
+/**
+ * @type {null|string|undefined}
+ */
+olx.source.XYZOptionsExtern.prototype.crossOrigin;
+
+
+/**
+ * @type {ol.Extent|undefined}
+ */
+olx.source.XYZOptionsExtern.prototype.extent;
+
+
+/**
+ * @type {string|undefined}
+ */
+olx.source.XYZOptionsExtern.prototype.logo;
+
+
+/**
+ * @type {number|undefined}
+ */
+olx.source.XYZOptionsExtern.prototype.maxZoom;
+
+
+/**
+ * @type {number|undefined}
+ */
+olx.source.XYZOptionsExtern.prototype.minZoom;
+
+
+/**
+ * @type {ol.proj.ProjectionLike}
+ */
+olx.source.XYZOptionsExtern.prototype.projection;
+
+
+/**
+ * @type {ol.TileUrlFunctionType|undefined}
+ */
+olx.source.XYZOptionsExtern.prototype.tileUrlFunction;
+
+
+/**
+ * @type {string|undefined}
+ */
+olx.source.XYZOptionsExtern.prototype.url;
+
+
+/**
+ * @type {Array.<string>|undefined}
+ */
+olx.source.XYZOptionsExtern.prototype.urls;
+
+
+
+/**
+ * @interface
+ */
+olx.style.FillOptionsExtern = function() {};
+
+
+/**
+ * @type {string|ol.expr.Expression|undefined}
+ */
+olx.style.FillOptionsExtern.prototype.color;
+
+
+/**
+ * @type {number|ol.expr.Expression|undefined}
+ */
+olx.style.FillOptionsExtern.prototype.opacity;
 
 
 
@@ -2121,60 +2197,16 @@ olx.style.IconOptionsExtern.prototype.url;
 olx.style.IconOptionsExtern.prototype.width;
 
 
-
 /**
- * @interface
+ * @type {number|ol.expr.Expression|undefined}
  */
-olx.style.LineOptionsExtern = function() {};
-
-
-/**
- * @type {string|ol.expr.Expression|undefined}
- */
-olx.style.LineOptionsExtern.prototype.strokeColor;
+olx.style.IconOptionsExtern.prototype.xOffset;
 
 
 /**
  * @type {number|ol.expr.Expression|undefined}
  */
-olx.style.LineOptionsExtern.prototype.strokeOpacity;
-
-
-/**
- * @type {number|ol.expr.Expression|undefined}
- */
-olx.style.LineOptionsExtern.prototype.strokeWidth;
-
-
-
-/**
- * @interface
- */
-olx.style.PolygonOptionsExtern = function() {};
-
-
-/**
- * @type {string|ol.expr.Expression|undefined}
- */
-olx.style.PolygonOptionsExtern.prototype.fillColor;
-
-
-/**
- * @type {number|ol.expr.Expression|undefined}
- */
-olx.style.PolygonOptionsExtern.prototype.opacity;
-
-
-/**
- * @type {string|ol.expr.Expression|undefined}
- */
-olx.style.PolygonOptionsExtern.prototype.strokeColor;
-
-
-/**
- * @type {number|ol.expr.Expression|undefined}
- */
-olx.style.PolygonOptionsExtern.prototype.strokeWidth;
+olx.style.IconOptionsExtern.prototype.yOffset;
 
 
 
@@ -2204,15 +2236,9 @@ olx.style.ShapeOptionsExtern = function() {};
 
 
 /**
- * @type {string|ol.expr.Expression|undefined}
+ * @type {ol.style.Fill|undefined}
  */
-olx.style.ShapeOptionsExtern.prototype.fillColor;
-
-
-/**
- * @type {number|ol.expr.Expression|undefined}
- */
-olx.style.ShapeOptionsExtern.prototype.fillOpacity;
+olx.style.ShapeOptionsExtern.prototype.fill;
 
 
 /**
@@ -2222,21 +2248,9 @@ olx.style.ShapeOptionsExtern.prototype.size;
 
 
 /**
- * @type {string|ol.expr.Expression|undefined}
+ * @type {ol.style.Stroke|undefined}
  */
-olx.style.ShapeOptionsExtern.prototype.strokeColor;
-
-
-/**
- * @type {number|ol.expr.Expression|undefined}
- */
-olx.style.ShapeOptionsExtern.prototype.strokeOpacity;
-
-
-/**
- * @type {number|ol.expr.Expression|undefined}
- */
-olx.style.ShapeOptionsExtern.prototype.strokeWidth;
+olx.style.ShapeOptionsExtern.prototype.stroke;
 
 
 /**
@@ -2249,13 +2263,44 @@ olx.style.ShapeOptionsExtern.prototype.type;
 /**
  * @interface
  */
+olx.style.StrokeOptionsExtern = function() {};
+
+
+/**
+ * @type {string|ol.expr.Expression|undefined}
+ */
+olx.style.StrokeOptionsExtern.prototype.color;
+
+
+/**
+ * @type {number|ol.expr.Expression|undefined}
+ */
+olx.style.StrokeOptionsExtern.prototype.opacity;
+
+
+/**
+ * @type {number|ol.expr.Expression|undefined}
+ */
+olx.style.StrokeOptionsExtern.prototype.width;
+
+
+
+/**
+ * @interface
+ */
 olx.style.StyleOptionsExtern = function() {};
 
 
 /**
- * @type {Array.<ol.style.Rule>}
+ * @type {Array.<ol.style.Rule>|undefined}
  */
 olx.style.StyleOptionsExtern.prototype.rules;
+
+
+/**
+ * @type {Array.<ol.style.Symbolizer>|undefined}
+ */
+olx.style.StyleOptionsExtern.prototype.symbolizers;
 
 
 
